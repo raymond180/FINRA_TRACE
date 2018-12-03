@@ -11,13 +11,13 @@ from gensim.test.utils import datapath
 # Import local files
 import get_data
 
-def data_groupby(data):
+def data_groupby():
+    data = get_data.get_data()
     data_gb = data.groupby(by=['document','BOND_SYM_ID'])
     return data_gb
 
 def get_matrix1():
-    data = get_data.get_data()
-    data_gb = data_groupby(data)
+    data_gb = data_groupby()
     print("computing matrix_1 ......")
     matrix_1 = data_gb['BOND_SYM_ID'].size().unstack(fill_value=0)
     matrix_1 = matrix_1.sort_index(axis=1)
@@ -57,3 +57,16 @@ def compute_topic(matrix,matrix_name,num_topics,workers=3,chunksize=10000,passes
 
     lda.save(save_path)
     print("Model successfully save at" + save_path)
+
+def main():
+    matrix_name = str(input("Please enter matrix_name"))
+    num_topics = int(input("Please enter num_topics"))
+    if(matrix_name == 'matrix_1' or matrix_name == 'matrix1'):
+        matrix = get_matrix1()
+    else:
+        matrix = get_matrix1()
+    id2word = get_id2word(matrix)
+    compute_topic(matrix,matrix_name,num_topics)
+    
+if __name__== "__main__":
+    main()
