@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #SBATCH --job-name=topicModeling
 #SBATCH --output main.out.%j
 #SBATCH --error main.out.%j
