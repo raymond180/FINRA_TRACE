@@ -95,8 +95,11 @@ def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=1000
     print("Saving Model as "+model_name)
     
     current_path = get_current_directory()
-    save_path = current_path.parent / ("./LDAModel/{}/".format(model_name))
     # create directory
+    save_path = current_path.parent / ("./LDAModel/")
+    create_directory(save_path)
+    # create sub-directory
+    save_path = save_path / ("./{}/".format(model_name))
     create_directory(save_path)
     
     save_path = save_path / model_name
