@@ -85,7 +85,7 @@ def load_id2word(id2word_name):
     print("id2word loaded!!")
     return id2word
 
-def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=10000,passes=20,iterations=50):
+def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=10000,passes=20,iterations=400):
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     print("LdaMulticore Start!!")
     lda = gensim.models.ldamulticore.LdaMulticore(corpus=corpus,id2word=id2word,workers=workers, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations)
