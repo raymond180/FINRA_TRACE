@@ -25,7 +25,7 @@ export PYRO_SERIALIZER=pickle
 export PYRO_LOGFILE=pyro.log
 export PYRO_LOGLEVEL=DEBUG
 
-srun python -m Pyro4.naming -n 0.0.0.0 &
+python -m Pyro4.naming -n 0.0.0.0 &
 
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
