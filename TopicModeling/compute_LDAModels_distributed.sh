@@ -4,7 +4,7 @@
 #SBATCH --output main.out.%j
 #SBATCH --error main.out.%j
 #SBATCH --time=08:00:00
-#SBATCH --qos=dpart
+#SBATCH --qos=deep
 #SBATCH --nodes=6
 #SBATCH --ntasks=12
 #SBATCH --ntasks-per-node=2
