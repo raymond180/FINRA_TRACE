@@ -11,19 +11,19 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem 23938mb
 
+source ~/miniconda3/bin/activate
+
 export PYRO_SERIALIZERS_ACCEPTED=pickle
 export PYRO_SERIALIZER=pickle
 
-source ~/miniconda3/bin/activate
+srun -N 1 --ntasks=1 python -m Pyro4.naming -n 0.0.0.0
 
-srun --ntasks=1 python -m Pyro4.naming -n 0.0.0.0 &
+srun python -m gensim.models.lsi_worker
+srun python -m gensim.models.lsi_worker
+srun python -m gensim.models.lsi_worker
+srun python -m gensim.models.lsi_worker
 
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
-
-srun --ntasks=1 python -m gensim.models.lsi_dispatcher &
+srun -N 1 --ntasks=1 python -m gensim.models.lsi_dispatcher
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
 
