@@ -23,7 +23,7 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 export PYRO_SERIALIZERS_ACCEPTED=pickle
 export PYRO_SERIALIZER=pickle
 
-srun -N 1 --ntasks=1 python -m Pyro4.naming -n $SLURM_SRUN_COMM_HOST
+srun -N 1 --ntasks=1 bash -c 'python -m Pyro4.naming -n 0.0.0.0:42257'
 
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
