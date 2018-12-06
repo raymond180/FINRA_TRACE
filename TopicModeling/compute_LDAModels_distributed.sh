@@ -9,7 +9,7 @@
 #SBATCH --ntasks=12
 #SBATCH --ntasks-per-node=2
 #SBATCH --cpus-per-task=8
-#SBATCH --mem 23938mb
+#SBATCH --mem=16gb
 
 source nfshomes/cchen07/miniconda3/bin/activate
 
