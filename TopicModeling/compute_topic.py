@@ -107,6 +107,29 @@ def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=1000
 
     lda.save(save_path)
     print("Model successfully save at" + save_path)
+	
+def compute_topic_distributed(corpus_name,corpus,num_topics,id2word,chunksize=10000,passes=40,iterations=400):
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    print("LdaMulticore Start!!")
+    lda = gensim.models.ldamodel.LdaModel(corpus=corpus,id2word=id2word, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations,distributed=True)
+    print("LdaMulticore Done!!")
+    
+    model_name = "{}_{}topics".format(corpus_name,num_topics)
+    print("Saving Model as "+model_name)
+    
+    current_path = get_current_directory()
+    # create directory
+    save_path = current_path.parent / ("./LDAModel/")
+    create_directory(save_path)
+    # create sub-directory
+    save_path = save_path / ("./{}/".format(model_name))
+    create_directory(save_path)
+    
+    save_path = save_path / model_name
+    save_path = datapath(str(save_path))
+
+    lda.save(save_path)
+    print("Model successfully save at" + save_path)
 
 def main():
     corpus_name = str(input("Please enter corpus_name: "))
