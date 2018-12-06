@@ -34,4 +34,4 @@ srun bash -c 'python -m gensim.models.lda_dispatcher' &
 
 srun -N 1 --ntasks=1 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher' &
 
-srun bash -c 'python ~/FINRA_TRACE/TopicModeling/main_distributed.py'
+srun bash -c 'python ~/FINRA_TRACE/TopicModeling/main_distributed.py' &
