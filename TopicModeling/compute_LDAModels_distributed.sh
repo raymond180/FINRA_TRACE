@@ -20,10 +20,10 @@ echo "SLURMTMPDIR="$SLURMTMPDIR
 
 echo "working directory = "$SLURM_SUBMIT_DIR
 
-export PYRO_SERIALIZERS_ACCEPTED=pickle
-export PYRO_SERIALIZER=pickle
+srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
+srun bash -c 'export PYRO_SERIALIZER=pickle'
 
-srun -N 1 --ntasks=1 bash -c 'python -m Pyro4.naming -n 0.0.0.0:42257'
+srun -N 1 --ntasks=1 bash -c 'python -m Pyro4.naming -n 0.0.0.0'
 
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
@@ -33,4 +33,3 @@ srun python -m gensim.models.lsi_worker &
 srun -N 1 --ntasks=1 python -m gensim.models.lsi_dispatcher
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
-
