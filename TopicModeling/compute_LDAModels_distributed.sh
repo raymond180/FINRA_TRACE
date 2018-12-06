@@ -13,10 +13,17 @@
 
 source ~/miniconda3/bin/activate
 
+echo "SLURM_JOBID="$SLURM_JOBID
+echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
+echo "SLURM_NNODES"=$SLURM_NNODES
+echo "SLURMTMPDIR="$SLURMTMPDIR
+
+echo "working directory = "$SLURM_SUBMIT_DIR
+
 export PYRO_SERIALIZERS_ACCEPTED=pickle
 export PYRO_SERIALIZER=pickle
 
-srun -N 1 --ntasks=1 python -m Pyro4.naming -n 0.0.0.0
+srun -N 1 --ntasks=1 python -m Pyro4.naming -n $SLURM_SRUN_COMM_HOST
 
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
