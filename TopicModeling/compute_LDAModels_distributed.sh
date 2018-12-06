@@ -25,8 +25,7 @@ srun bash -c 'export PYRO_SERIALIZER=pickle'
 srun bash -c 'export PYRO_LOGFILE=pyro.log'
 srun bash -c 'export PYRO_LOGLEVEL=DEBUG'
 
-
-srun -N 1 --ntasks=1 bash -c 'python -m Pyro4.naming' &
+python -m Pyro4.naming -n 0.0.0.0 &
 
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
