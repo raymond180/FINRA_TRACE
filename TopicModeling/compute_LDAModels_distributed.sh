@@ -20,18 +20,18 @@ echo "SLURMTMPDIR="$SLURMTMPDIR
 
 echo "working directory = "$SLURM_SUBMIT_DIR
 
-export PYRO_SERIALIZERS_ACCEPTED=pickle
-export PYRO_SERIALIZER=pickle
-export PYRO_LOGFILE=pyro.log
-export PYRO_LOGLEVEL=DEBUG
+srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
+srun bash -c 'export PYRO_SERIALIZER=pickle'
 
-srun --nodes=1 --ntasks=1 --time=08:00:00 python -m Pyro4.naming -n 0.0.0.0 &
+bash -c 'a=`hostname`;python -m Pyro4.naming -n $a'
 
-srun python -m gensim.models.lda_worker &
-srun python -m gensim.models.lda_worker &
-srun python -m gensim.models.lda_worker &
-srun python -m gensim.models.lda_worker &
+#srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'a=`hostname`;python -m Pyro4.naming -n $a' &
 
-srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb python -m gensim.models.lda_dispatcher &
+srun bash -c 'python -m gensim.models.lda_worker --host $a' &
+srun bash -c 'python -m gensim.models.lda_worker --host $a' &
+srun bash -c 'python -m gensim.models.lda_worker --host $a' &
+srun bash -c 'python -m gensim.models.lda_worker --host $a' &
+
+srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host $a' &
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
