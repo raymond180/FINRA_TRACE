@@ -26,7 +26,7 @@ srun bash -c 'export PYRO_LOGFILE=pyro.log'
 srun bash -c 'export PYRO_LOGLEVEL=DEBUG'
 
 
-srun -N 1 --ntasks=1 bash -c 'a=$SLURM_SRUN_COMM_HOST; b=$SLURM_SRUN_COMM_PORT;python -m Pyro4.naming -n $a :$b' &
+srun -N 1 --ntasks=1 bash -c 'python -m Pyro4.naming' &
 
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
