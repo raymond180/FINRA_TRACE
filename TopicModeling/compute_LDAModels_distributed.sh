@@ -32,6 +32,6 @@ srun bash -c 'python -m gensim.models.lsi_worker' &
 srun bash -c 'python -m gensim.models.lsi_worker' &
 srun bash -c 'python -m gensim.models.lsi_worker' &
 
-srun -N 1 --ntasks=1 --mem=16gb bash -c 'python -m gensim.models.lsi_dispatcher' &
+srun -N 1 --ntasks=1 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher' &
 
 srun bash -c 'python ~/FINRA_TRACE/TopicModeling/main_distributed.py'
