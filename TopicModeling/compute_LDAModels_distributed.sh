@@ -5,8 +5,8 @@
 #SBATCH --error main.out.%j
 #SBATCH --time=08:00:00
 #SBATCH --qos=dpart
-#SBATCH --nodes=10
-#SBATCH --ntasks=10
+#SBATCH --nodes=6
+#SBATCH --ntasks=6
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem 23938mb
