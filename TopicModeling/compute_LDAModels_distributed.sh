@@ -34,4 +34,4 @@ python -m gensim.models.lsi_worker &
 
 python -m gensim.models.lsi_dispatcher &
 
-srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
+python ~/FINRA_TRACE/TopicModeling/main_distributed.py &
