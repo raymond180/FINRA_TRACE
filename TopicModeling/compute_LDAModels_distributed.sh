@@ -20,10 +20,10 @@ echo "SLURMTMPDIR="$SLURMTMPDIR
 
 echo "working directory = "$SLURM_SUBMIT_DIR
 
-srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
-srun bash -c 'export PYRO_SERIALIZER=pickle'
-srun bash -c 'export PYRO_LOGFILE=pyro.log'
-srun bash -c 'export PYRO_LOGLEVEL=DEBUG'
+export PYRO_SERIALIZERS_ACCEPTED=pickle
+export PYRO_SERIALIZER=pickle
+export PYRO_LOGFILE=pyro.log
+export PYRO_LOGLEVEL=DEBUG
 
 srun python -m Pyro4.naming -n 0.0.0.0 &
 
