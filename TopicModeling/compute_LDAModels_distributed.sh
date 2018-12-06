@@ -11,12 +11,12 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=16gb
 
-source /nfshomes/cchen07/miniconda3/bin/activate
-
 echo "SLURM_JOBID="$SLURM_JOBID
 echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
 echo "SLURM_NNODES"=$SLURM_NNODES
 echo "SLURMTMPDIR="$SLURMTMPDIR
+
+source nfshomes/cchen07/miniconda3/bin/activate
 
 echo "working directory = "$SLURM_SUBMIT_DIR
 
@@ -34,4 +34,4 @@ srun bash -c 'python -m gensim.models.lda_worker --host $a' &
 
 srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host $a' &
 
-srun python /nfshomes/cchen07/FINRA_TRACE/TopicModeling/main_distributed.py
+srun python nfshomes/cchen07/FINRA_TRACE/TopicModeling/main_distributed.py
