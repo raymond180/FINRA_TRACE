@@ -6,10 +6,10 @@
 #SBATCH --time=08:00:00
 #SBATCH --qos=dpart
 #SBATCH --nodes=6
-#SBATCH --ntasks=12
-#SBATCH --ntasks-per-node=2
-#SBATCH --cpus-per-task=8
-#SBATCH --mem 7821mb
+#SBATCH --ntasks=6
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem 23938mb
 
 export PYRO_SERIALIZERS_ACCEPTED=pickle
 export PYRO_SERIALIZER=pickle
@@ -23,7 +23,7 @@ srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 
-srun -N 1 --mem=20gb python -m gensim.models.lsi_dispatcher &
+srun -N 1 --mem=23938mb python -m gensim.models.lsi_dispatcher &
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
 
