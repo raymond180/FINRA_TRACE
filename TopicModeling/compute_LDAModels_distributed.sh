@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem 23938mb
 
-source ~/miniconda3/bin/activate
+source nfshomes/cchen07/miniconda3/bin/activate
 
 echo "SLURM_JOBID="$SLURM_JOBID
 echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
@@ -23,10 +23,9 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
 srun bash -c 'export PYRO_SERIALIZER=pickle'
 
-echo `hostname`
-bash -c 'a=`hostname`;python -m Pyro4.naming -n $a' &
+#bash -c 'a=`hostname`;python -m Pyro4.naming -n $a' &
 
-#srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'a=`hostname`;python -m Pyro4.naming -n $a' &
+srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'a=`hostname`;python -m Pyro4.naming -n 0.0.0.0' &
 
 srun bash -c 'python -m gensim.models.lda_worker --host $a' &
 srun bash -c 'python -m gensim.models.lda_worker --host $a' &
@@ -35,4 +34,4 @@ srun bash -c 'python -m gensim.models.lda_worker --host $a' &
 
 srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host $a' &
 
-srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
+srun python nfshomes/cchen07/FINRA_TRACE/TopicModeling/main_distributed.py
