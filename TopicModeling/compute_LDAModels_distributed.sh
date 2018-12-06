@@ -16,14 +16,14 @@ export PYRO_SERIALIZER=pickle
 
 source ~/miniconda3/bin/activate
 
-srun -N 1 python -m Pyro4.naming -n 0.0.0.0 &
+srun --ntasks=1 python -m Pyro4.naming -n 0.0.0.0 &
 
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 
-srun -N 1 --mem=23938mb python -m gensim.models.lsi_dispatcher &
+srun --ntasks=1 python -m gensim.models.lsi_dispatcher &
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
 
