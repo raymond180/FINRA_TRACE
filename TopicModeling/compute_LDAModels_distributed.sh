@@ -6,9 +6,9 @@
 #SBATCH --time=08:00:00
 #SBATCH --qos=dpart
 #SBATCH --nodes=6
-#SBATCH --ntasks=6
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
+#SBATCH --ntasks=12
+#SBATCH --ntasks-per-node=2
+#SBATCH --cpus-per-task=8
 #SBATCH --mem 23938mb
 
 source ~/miniconda3/bin/activate
@@ -25,13 +25,13 @@ export PYRO_SERIALIZER=pickle
 export PYRO_LOGFILE=pyro.log
 export PYRO_LOGLEVEL=DEBUG
 
-srun python -m Pyro4.naming -n 0.0.0.0 &
+srun --ntasks=1 bash -c 'python -m Pyro4.naming -n 0.0.0.0' &
 
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
+srun bash -c 'python -m gensim.models.lsi_worker' &
+srun bash -c 'python -m gensim.models.lsi_worker' &
+srun bash -c 'python -m gensim.models.lsi_worker' &
+srun bash -c 'python -m gensim.models.lsi_worker' &
 
-srun python -m gensim.models.lsi_dispatcher &
+srun --ntasks=1 --mem=16gb bash -c 'python -m gensim.models.lsi_dispatcher' &
 
-srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py &
+srun bash -c 'python ~/FINRA_TRACE/TopicModeling/main_distributed.py'
