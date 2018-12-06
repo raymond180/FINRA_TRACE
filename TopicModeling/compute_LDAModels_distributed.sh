@@ -25,13 +25,13 @@ export PYRO_SERIALIZER=pickle
 export PYRO_LOGFILE=pyro.log
 export PYRO_LOGLEVEL=DEBUG
 
-srun python -m Pyro4.naming -n 0.0.0.0 &
+srun --nodes=1 --ntasks=1 --time=08:00:00 python -m Pyro4.naming -n 0.0.0.0 &
 
 srun python -m gensim.models.lda_dispatcher &
 srun python -m gensim.models.lda_dispatcher &
 srun python -m gensim.models.lda_dispatcher &
 srun python -m gensim.models.lda_dispatcher &
 
-srun python -m gensim.models.lda_dispatcher &
+srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb python -m gensim.models.lda_dispatcher &
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
