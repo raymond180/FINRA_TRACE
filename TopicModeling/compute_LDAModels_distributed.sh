@@ -27,10 +27,10 @@ export PYRO_LOGLEVEL=DEBUG
 
 srun -N 1 --ntasks=1 bash -c 'python -m Pyro4.naming -n 0.0.0.0' &
 
-srun bash -c 'python -m gensim.models.lsi_worker' &
-srun bash -c 'python -m gensim.models.lsi_worker' &
-srun bash -c 'python -m gensim.models.lsi_worker' &
-srun bash -c 'python -m gensim.models.lsi_worker' &
+srun bash -c 'python -m gensim.models.lda_dispatcher' &
+srun bash -c 'python -m gensim.models.lda_dispatcher' &
+srun bash -c 'python -m gensim.models.lda_dispatcher' &
+srun bash -c 'python -m gensim.models.lda_dispatcher' &
 
 srun -N 1 --ntasks=1 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher' &
 
