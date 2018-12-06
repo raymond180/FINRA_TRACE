@@ -33,6 +33,6 @@ srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 
-srun --nodes=[1-1] --ntasks=1 python -m gensim.models.lsi_dispatcher &
+srun --nodes=1 --ntasks=1 python -m gensim.models.lsi_dispatcher &
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
