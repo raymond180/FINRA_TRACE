@@ -25,12 +25,12 @@ export PYRO_SERIALIZER=pickle
 export PYRO_LOGFILE=pyro.log
 export PYRO_LOGLEVEL=DEBUG
 
-srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'python -m Pyro4.naming -n `hostname`' &
+srun --nodes=1 --ntasks=1 --time=08:00:00 python -m Pyro4.naming -n 0.0.0.0 &
 
-srun python -m gensim.models.lda_dispatcher &
-srun python -m gensim.models.lda_dispatcher &
-srun python -m gensim.models.lda_dispatcher &
-srun python -m gensim.models.lda_dispatcher &
+srun python -m gensim.models.lda_worker &
+srun python -m gensim.models.lda_worker &
+srun python -m gensim.models.lda_worker &
+srun python -m gensim.models.lda_worker &
 
 srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb python -m gensim.models.lda_dispatcher &
 
