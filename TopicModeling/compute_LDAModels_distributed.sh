@@ -24,7 +24,7 @@ srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
 srun bash -c 'export PYRO_SERIALIZER=pickle'
 
 echo `hostname`
-bash -c 'a=`hostname`;python -m Pyro4.naming -n $a'
+bash -c 'a=`hostname`;python -m Pyro4.naming -n $a' &
 
 #srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'a=`hostname`;python -m Pyro4.naming -n $a' &
 
