@@ -32,6 +32,6 @@ srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 srun python -m gensim.models.lsi_worker &
 
-srun --mem=32gb python -m gensim.models.lsi_dispatcher &
+srun --mem=20gb python -m gensim.models.lsi_dispatcher &
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
