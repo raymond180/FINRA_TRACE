@@ -27,11 +27,11 @@ export PYRO_LOGLEVEL=DEBUG
 
 python -m Pyro4.naming -n 0.0.0.0 &
 
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
-srun python -m gensim.models.lsi_worker &
+python -m gensim.models.lsi_worker &
+python -m gensim.models.lsi_worker &
+python -m gensim.models.lsi_worker &
+python -m gensim.models.lsi_worker &
 
-srun python -m gensim.models.lsi_dispatcher &
+python -m gensim.models.lsi_dispatcher &
 
-srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py &
+srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
