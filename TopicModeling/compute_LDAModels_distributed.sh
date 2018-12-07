@@ -21,12 +21,14 @@ source ~/miniconda3/bin/activate
 echo "working directory = "$SLURM_SUBMIT_DIR
 
 #python -m Pyro4.naming -n `hostname`
+export PYRO_LOGFILE=pyro.log
+export PYRO_LOGLEVEL=DEBUG
 
 srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
 srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
 srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
 srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
 
-srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_dispatcher --host opensub00.umiacs.umd.edu' &
+srun --nodes=1 --ntasks=1 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_dispatcher --host opensub00.umiacs.umd.edu' &
 
 srun --nodes=1 --ntasks=1 python ~/FINRA_TRACE/TopicModeling/main_distributed.py
