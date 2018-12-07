@@ -16,7 +16,7 @@ echo "SLURM_JOB_NODELIST"=$SLURM_JOB_NODELIST
 echo "SLURM_NNODES"=$SLURM_NNODES
 echo "SLURMTMPDIR="$SLURMTMPDIR
 
-source nfshomes/cchen07/miniconda3/bin/activate
+source ~/miniconda3/bin/activate
 
 echo "working directory = "$SLURM_SUBMIT_DIR
 
@@ -32,4 +32,4 @@ srun bash -c 'python -m gensim.models.lda_worker --host 127.0.0.0' &
 
 srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host 127.0.0.0' &
 
-srun python nfshomes/cchen07/FINRA_TRACE/TopicModeling/main_distributed.py
+srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
