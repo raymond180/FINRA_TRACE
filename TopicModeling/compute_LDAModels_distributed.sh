@@ -6,9 +6,9 @@
 #SBATCH --time=08:00:00
 #SBATCH --qos=dpart
 #SBATCH --nodes=6
-#SBATCH --ntasks=12
-#SBATCH --ntasks-per-node=2
-#SBATCH --cpus-per-task=8
+#SBATCH --ntasks=6
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=16gb
 
 echo "SLURM_JOBID="$SLURM_JOBID
@@ -18,16 +18,16 @@ echo "SLURMTMPDIR="$SLURMTMPDIR
 
 source ~/miniconda3/bin/activate
 
+srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
+srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZER=pickle'
+
 echo "working directory = "$SLURM_SUBMIT_DIR
 
-srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
-srun bash -c 'export PYRO_SERIALIZER=pickle'
+srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
+srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
+srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
+srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
 
-srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
-srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
-srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
-srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
+srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host 128.8.132.247' &
 
-srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host opensub00.umiacs.umd.edu' &
-
-srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
+srun --nodes=5 --ntasks=5 python ~/FINRA_TRACE/TopicModeling/main_distributed.py
