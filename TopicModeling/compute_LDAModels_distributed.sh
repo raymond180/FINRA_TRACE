@@ -23,13 +23,11 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
 srun bash -c 'export PYRO_SERIALIZER=pickle'
 
-srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'a=`hostname`;python -m Pyro4.naming -n 127.0.0.0' &
+srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
+srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
+srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
+srun bash -c 'python -m gensim.models.lda_worker --host opensub00.umiacs.umd.edu' &
 
-srun bash -c 'python -m gensim.models.lda_worker --host 127.0.0.0' &
-srun bash -c 'python -m gensim.models.lda_worker --host 127.0.0.0' &
-srun bash -c 'python -m gensim.models.lda_worker --host 127.0.0.0' &
-srun bash -c 'python -m gensim.models.lda_worker --host 127.0.0.0' &
-
-srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host 127.0.0.0' &
+srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host opensub00.umiacs.umd.edu' &
 
 srun python ~/FINRA_TRACE/TopicModeling/main_distributed.py
