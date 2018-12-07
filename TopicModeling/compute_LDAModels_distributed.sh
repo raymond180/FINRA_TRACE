@@ -18,16 +18,13 @@ echo "SLURMTMPDIR="$SLURMTMPDIR
 
 source ~/miniconda3/bin/activate
 
-srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle'
-srun --nodes=6 --ntasks=6 bash -c 'export PYRO_SERIALIZER=pickle'
-
 echo "working directory = "$SLURM_SUBMIT_DIR
 
-srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
-srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
-srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
-srun bash -c 'python -m gensim.models.lda_worker --host 128.8.132.247' &
+srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host 128.8.132.247' &
+srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host 128.8.132.247' &
+srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host 128.8.132.247' &
+srun bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker --host 128.8.132.247' &
 
-srun --nodes=1 --ntasks=1 --time=08:00:00 --mem=16gb bash -c 'python -m gensim.models.lda_dispatcher --host 128.8.132.247' &
+srun --nodes=1 --ntasks=1 --time=08:00:00 bash -c 'python -m gensim.models.lda_dispatcher --host 128.8.132.247' &
 
-srun --nodes=5 --ntasks=5 python ~/FINRA_TRACE/TopicModeling/main_distributed.py
+srun --nodes=6 --ntasks=6 python ~/FINRA_TRACE/TopicModeling/main_distributed.py
