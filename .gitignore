@@ -110,6 +110,7 @@ venv.bak/
 *.csv
 
 Data/
+LDAModel/
 Data.rar
 
 
