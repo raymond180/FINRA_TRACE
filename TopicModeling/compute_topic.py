@@ -88,7 +88,7 @@ def load_id2word(id2word_name):
 def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=10000,passes=40,iterations=400):
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     print("LdaMulticore Start!!")
-    lda = gensim.models.ldamulticore.LdaMulticore(corpus=corpus,id2word=id2word,workers=workers, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations)
+    lda = gensim.models.ldamulticore.LdaMulticore(corpus=corpus,id2word=id2word,workers=workers, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations,dtype=np.float64)
     print("LdaMulticore Done!!")
     
     model_name = "{}_{}topics".format(corpus_name,num_topics)
@@ -111,7 +111,7 @@ def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=1000
 def compute_topic_distributed(corpus_name,corpus,num_topics,id2word,chunksize=10000,passes=40,iterations=400):
     logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     print("LdaMulticore Start!!")
-    lda = gensim.models.ldamodel.LdaModel(corpus=corpus,id2word=id2word, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations,distributed=True)
+    lda = gensim.models.ldamodel.LdaModel(corpus=corpus,id2word=id2word, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations,distributed=True,dtype=np.float64)
     print("LdaMulticore Done!!")
     
     model_name = "{}_{}topics".format(corpus_name,num_topics)
