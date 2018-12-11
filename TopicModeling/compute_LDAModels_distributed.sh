@@ -20,7 +20,7 @@ source ~/miniconda3/bin/activate
 
 echo "working directory = "$SLURM_SUBMIT_DIR
 
-#python -m Pyro4.naming -n `hostname`
+srun --nodes=1 --ntasks=1 bash -c  'python -m Pyro4.naming -n 0.0.0.0' &
 export PYRO_LOGFILE=pyro.log
 export PYRO_LOGLEVEL=DEBUG
 

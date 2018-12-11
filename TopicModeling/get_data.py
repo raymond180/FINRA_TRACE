@@ -4,6 +4,8 @@ import numpy as np
 import os
 from pathlib import Path
 
+from manage_path import get_current_directory,create_directory
+
 def read_data():
     root_folder = Path('../Data/')
     file_name = 'TRACE2014_jinming.csv'
@@ -33,12 +35,13 @@ def to_pickle():
     file_path = root_folder / file_name
     data.to_pickle(file_path)
     
-def get_data():
-    root_folder = Path('../Data/Pickle/')
-    file_name = 'TRACE2014_jinming'
-    file_path = root_folder / file_name
+def load_data(file_name="TRACE2014_jinming"):
+    print("loading data {}...".format(file_name))
+    current_path = get_current_directory()
+    data_save_path = current_path.parent / "./Data/Pickle/"
+    data_save_path = data_save_path / file_name
     
-    print("Getting data from{}...".format(file_path))
-    data = pd.read_pickle(file_path)
+    print("Getting data from{}...".format(data_save_path))
+    data = pd.read_pickle(data_save_path)
     print("Data getting success!")
     return data

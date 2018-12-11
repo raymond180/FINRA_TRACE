@@ -16,7 +16,7 @@ import get_data
 from manage_path import get_current_directory,create_directory
 
 def data_groupby():
-    data = get_data.get_data()
+    data = get_data.load_data()
     data_gb = data.groupby(by=['document','BOND_SYM_ID'])
     return data_gb
 
@@ -28,13 +28,29 @@ def compute_matrix1():
     print("computing matrix_1 done!")
     return matrix_1
 
+def compute_matrix2():
+    data_gb = data_groupby()
+    print("computing matrix_2 ......")
+    matrix_2 = data_gb['ENTRD_VOL_QT'].sum().unstack(fill_value=0)
+    matrix_2 = matrix_2.sort_index(axis=1)
+    print("computing matrix_2 done!")
+    return matrix_2
+
+def compute_matrix3():
+    data_gb = data_groupby()
+    print("computing matrix_3 ......")
+    data_gb['cap'] = pd.eval(data_gb['ENTRD_VOL_QT'] * data_gb['RPTF_PR'])
+    matrix_3 = data_gb['cap'].sum().unstack(fill_value=0)
+    matrix_3 = matrix_3.sort_index(axis=1)
+    print("computing matrix_3 done!")
+    return matrix_3
+
 def compute_corpus(matrix):
     corpus = gensim.matutils.Dense2Corpus(matrix.values,documents_columns=False)
     return corpus
 
 def save_corpus(corpus,file_name):
-    current_path = os.getcwd()
-    current_path = Path(current_path)
+    current_path = get_current_directory()
     corpus_save_path = current_path.parent / "./Data/Corpus/"
     try:
         os.mkdir(corpus_save_path)
@@ -47,8 +63,7 @@ def save_corpus(corpus,file_name):
     
 def load_corpus(file_name):
     print("loading corpus...")
-    current_path = os.getcwd()
-    current_path = Path(current_path)
+    current_path = get_current_directory()
     corpus_load_path = current_path.parent / "./Data/Corpus/"
     file_name = corpus_load_path / "{}.mm".format(file_name)
     file_name = str(file_name)
