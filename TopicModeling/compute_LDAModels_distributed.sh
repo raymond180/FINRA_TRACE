@@ -24,8 +24,12 @@ echo "working directory = "$SLURM_SUBMIT_DIR
 
 srun --nodes=1 --ntasks=1 --wait=0 bash -c  'python -m Pyro4.naming -n 0.0.0.0' &
 
+python ~/FINRA_TRACE/TopicModeling/sleep.py
+
 srun --nodes=6 --ntasks=6 --wait=0 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_worker' &
 
 srun --nodes=1 --ntasks=1 --wait=0 bash -c 'export PYRO_SERIALIZERS_ACCEPTED=pickle;export PYRO_SERIALIZER=pickle;python -m gensim.models.lda_dispatcher' &
+
+python ~/FINRA_TRACE/TopicModeling/sleep.py
 
 srun --nodes=1 --ntasks=1 python ~/FINRA_TRACE/TopicModeling/main_distributed.py
