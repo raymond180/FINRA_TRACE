@@ -1,7 +1,12 @@
 from compute_topic import load_corpus,load_id2word,compute_topic,compute_topic_distributed
+import time
 
 def main():
-    corpus = load_corpus("matrix_1")
+    sleep_time = 180
+	print("sleeping for {} seconds".format(sleep_time))
+	time.sleep(sleep_time)
+	print("sleeping finished!!"
+	corpus = load_corpus("matrix_1")
     id2word = load_id2word("matrix_1")
     corpus_name = "matrix_1"
     num_topics_array = [100,150,250,500,750,1000]
