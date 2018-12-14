@@ -1,7 +1,7 @@
 from compute_topic import load_corpus,load_id2word,compute_topic,compute_topic_distributed
 
 def main():
-	corpus = load_corpus("matrix_1")
+    corpus = load_corpus("matrix_1")
     id2word = load_id2word("matrix_1")
     corpus_name = "matrix_1"
     num_topics_array = [100,150,250,500,750,1000]
