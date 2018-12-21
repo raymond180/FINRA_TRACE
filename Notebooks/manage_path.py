@@ -33,7 +33,7 @@ def get_dataset_directory():
     dataset_directory = data_directory / "Dataset"
     return dataset_directory
 
-def get_Pickle_directory():
+def get_pickle_directory():
     """Return path of Data/Pickle directory"""
     data_directory = get_data_directory()
     pickle_directory = data_directory / "Pickle"

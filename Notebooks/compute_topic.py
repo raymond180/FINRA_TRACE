@@ -16,15 +16,17 @@ import get_data
 from manage_path import *
 
 def data_groupby():
-    data = get_data.load_data()
-    data_gb = data.groupby(by=['document','BOND_SYM_ID'])
-    return data_gb
+    data = get_data.load_data(file_name="TRACE2014_jinming.pkl")
+    data_gb_sell = data.groupby(by=['document_sell','BOND_SYM_ID'])
+    data_gb_buy = data.groupby(by=['document_buy','BOND_SYM_ID'])
+    return (data_gb_sell,data_gb_buy)
 
 def compute_matrix1():
     """Compute matrix_1 which is count of bonds on given dealer and day"""
-    data_gb = data_groupby()
+    data_gb_sell,data_gb_buy = data_groupby()
     print("computing matrix_1 ......")
-    matrix_1 = data_gb['BOND_SYM_ID'].size().unstack(fill_value=0)
+    matrix_1 = data_gb_sell['BOND_SYM_ID'].size().unstack(fill_value=0)
+    matrix_1 = matrix_1.append(data_gb_buy['BOND_SYM_ID'].size().unstack(fill_value=0))
     matrix_1 = matrix_1.sort_index(axis=1)
     print("computing matrix_1 done!")
     return matrix_1
@@ -53,8 +55,8 @@ def compute_corpus(matrix):
 
 def save_corpus(corpus,corpus_save_name):
     """Save the corpus given copus object and """
-    corpus_directory = get_corpus_directory
-    if not current_path.is_dir():
+    corpus_directory = get_corpus_directory()
+    if not corpus_directory.is_dir():
         create_directory(corpus_directory)
     file_name = corpus_directory / "{}.mm".format(corpus_save_name)
     gensim.corpora.MmCorpus.serialize(str(file_name), corpus)

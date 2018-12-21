@@ -16,15 +16,17 @@ import get_data
 from manage_path import *
 
 def data_groupby():
-    data = get_data.load_data()
-    data_gb = data.groupby(by=['document','BOND_SYM_ID'])
-    return data_gb
+    data = get_data.load_data(file_name="TRACE2014_jinming.pkl")
+    data_gb_sell = data.groupby(by=['document_sell','BOND_SYM_ID'])
+    data_gb_buy = data.groupby(by=['document_buy','BOND_SYM_ID'])
+    return (data_gb_sell,data_gb_buy)
 
 def compute_matrix1():
     """Compute matrix_1 which is count of bonds on given dealer and day"""
-    data_gb = data_groupby()
+    data_gb_sell,data_gb_buy = data_groupby()
     print("computing matrix_1 ......")
-    matrix_1 = data_gb['BOND_SYM_ID'].size().unstack(fill_value=0)
+    matrix_1 = data_gb_sell['BOND_SYM_ID'].size().unstack(fill_value=0)
+    matrix_1 = matrix_1.append(data_gb_buy['BOND_SYM_ID'].size().unstack(fill_value=0))
     matrix_1 = matrix_1.sort_index(axis=1)
     print("computing matrix_1 done!")
     return matrix_1
@@ -53,8 +55,8 @@ def compute_corpus(matrix):
 
 def save_corpus(corpus,corpus_save_name):
     """Save the corpus given copus object and """
-    corpus_directory = get_corpus_directory
-    if not current_path.is_dir():
+    corpus_directory = get_corpus_directory()
+    if not corpus_directory.is_dir():
         create_directory(corpus_directory)
     file_name = corpus_directory / "{}.mm".format(corpus_save_name)
     gensim.corpora.MmCorpus.serialize(str(file_name), corpus)
@@ -79,7 +81,7 @@ def compute_id2word(matrix,matrix_name,save=True):
     if(save):
         print("saving id2word ...")
         id2word_directory = get_id2word_directory()
-        file_name = id2word_directory / "{}.npy".format(file_name)
+        file_name = id2word_directory / "{}.npy".format(matrix_name)
         # save the id2word using numpy
         np.save(file_name, id2word)
         print("id2word saved!!")
@@ -95,11 +97,13 @@ def load_id2word(id2word_name):
     print("id2word loaded!!")
     return id2word
 
-def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=10000,passes=40,iterations=400):
+def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=25000,passes=40,iterations=600):
+    create_directory('logs')
     log_filename = "./logs/{}_{}topics.log".format(corpus_name,num_topics)
     logging.basicConfig(filename=log_filename,format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     print("LdaMulticore Start!!")
-    lda = gensim.models.ldamulticore.LdaMulticore(corpus=corpus,id2word=id2word,workers=workers, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations,dtype=np.float64)
+    lda = gensim.models.ldamulticore.LdaMulticore(corpus=corpus,id2word=id2word,workers=workers, num_topics=num_topics, chunksize=chunksize \
+                                                  , passes=passes,iterations=iterations,dtype=np.float64,random_state=1)
     print("LdaMulticore Done!!")
     
     model_name = "{}_{}topics".format(corpus_name,num_topics)
@@ -119,11 +123,13 @@ def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=1000
     lda.save(save_path)
     print("Model successfully save at" + save_path)
 	
-def compute_topic_distributed(corpus_name,corpus,num_topics,id2word,chunksize=10000,passes=40,iterations=400):
+def compute_topic_distributed(corpus_name,corpus,num_topics,id2word,chunksize=25000,passes=40,iterations=600):
+    create_directory('logs')
     log_filename = "{}_{}topics.log".format(corpus_name,num_topics)
     logging.basicConfig(filename=log_filename,format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     print("LdaMulticore Start!!")
-    lda = gensim.models.ldamodel.LdaModel(corpus=corpus,id2word=id2word, num_topics=num_topics, chunksize=chunksize, passes=passes,iterations=iterations,distributed=True,dtype=np.float64)
+    lda = gensim.models.ldamodel.LdaModel(corpus=corpus,id2word=id2word, num_topics=num_topics, chunksize=chunksize, passes=passes \
+                                          ,iterations=iterations,distributed=True,dtype=np.float64,random_state=1)
     print("LdaMulticore Done!!")
     
     model_name = "{}_{}topics".format(corpus_name,num_topics)
