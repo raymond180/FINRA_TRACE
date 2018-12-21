@@ -11,5 +11,5 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem 32gb
 
-source nfshomes/cchen07/miniconda3/bin/activate
-srun python nfshomes/cchen07/FINRA_TRACE/TopicModeling/main.py
+source ~/miniconda3/bin/activate
+srun python ~/FINRA_TRACE/TopicModeling/main.py
