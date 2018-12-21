@@ -20,6 +20,30 @@ def get_project_directory():
     current_directory = Path.cwd()
     project_directory = current_directory.parents[0]
     return project_directory
+
+def get_LDAModel_directory():
+    """Return path of LDAModel directory"""
+    project_directory = get_project_directory()
+    LDAModel_directory = project_directory / 'LDAModel'
+    if not LDAModel_directory.is_dir():
+        create_directory(LDAModel_directory)
+    return LDAModel_directory
+
+def get_logs_directory():
+    """Return path of logs directory"""
+    LDAModel_directory = get_LDAModel_directory()
+    logs_directory = LDAModel_directory / 'logs'
+    if not logs_directory.is_dir():
+        create_directory(logs_directory)
+    return logs_directory
+
+def get_result_directory():
+    """Return path of Result directory"""
+    project_directory = get_project_directory()
+    result_directory = project_directory / 'Result'
+    if not result_directory.is_dir():
+        create_directory(result_directory)
+    return result_directory
     
 def get_data_directory():
     """Return path of Data directory"""

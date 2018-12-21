@@ -18,7 +18,9 @@ from manage_path import *
 def data_groupby():
     data = get_data.load_data(file_name="TRACE2014_jinming.pkl")
     data_gb_sell = data.groupby(by=['document_sell','BOND_SYM_ID'])
+    data_gb_sell.astype(np.int16)
     data_gb_buy = data.groupby(by=['document_buy','BOND_SYM_ID'])
+    data_gb_buy.astype(np.int16)
     return (data_gb_sell,data_gb_buy)
 
 def compute_matrix1():
@@ -98,8 +100,9 @@ def load_id2word(id2word_name):
     return id2word
 
 def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=25000,passes=40,iterations=600):
-    create_directory('logs')
-    log_filename = "./logs/{}_{}topics.log".format(corpus_name,num_topics)
+    logs_directory = get_logs_directory()
+    filename = "{}_{}topics.log".format(corpus_name,num_topics)
+    log_filename = logs_directory / filename
     logging.basicConfig(filename=log_filename,format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     print("LdaMulticore Start!!")
     lda = gensim.models.ldamulticore.LdaMulticore(corpus=corpus,id2word=id2word,workers=workers, num_topics=num_topics, chunksize=chunksize \
@@ -109,10 +112,8 @@ def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=2500
     model_name = "{}_{}topics".format(corpus_name,num_topics)
     print("Saving Model as "+model_name)
     
-    current_path = get_current_directory()
     # create directory
-    save_path = current_path.parent / ("./LDAModel/")
-    create_directory(save_path)
+    save_path = get_LDAModel_directory()
     # create sub-directory
     save_path = save_path / ("./{}/".format(model_name))
     create_directory(save_path)
@@ -124,8 +125,9 @@ def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=2500
     print("Model successfully save at" + save_path)
 	
 def compute_topic_distributed(corpus_name,corpus,num_topics,id2word,chunksize=25000,passes=40,iterations=600):
-    create_directory('logs')
-    log_filename = "{}_{}topics.log".format(corpus_name,num_topics)
+    logs_directory = get_logs_directory()
+    filename = "{}_{}topics.log".format(corpus_name,num_topics)
+    log_filename = logs_directory / filename
     logging.basicConfig(filename=log_filename,format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
     print("LdaMulticore Start!!")
     lda = gensim.models.ldamodel.LdaModel(corpus=corpus,id2word=id2word, num_topics=num_topics, chunksize=chunksize, passes=passes \
@@ -135,10 +137,7 @@ def compute_topic_distributed(corpus_name,corpus,num_topics,id2word,chunksize=25
     model_name = "{}_{}topics".format(corpus_name,num_topics)
     print("Saving Model as "+model_name)
     
-    current_path = get_current_directory()
-    # create directory
-    save_path = current_path.parent / ("./LDAModel/")
-    create_directory(save_path)
+    save_path = get_LDAModel_directory()
     # create sub-directory
     save_path = save_path / ("./{}/".format(model_name))
     create_directory(save_path)
@@ -153,6 +152,7 @@ def main():
     corpus_name = str(input("Please enter corpus_name: "))
     num_topics = int(input("Please enter num_topics: "))
     workers = int(input("Please enter number of workers: "))
+    passes = int(input("Please enter number of passes: "))
     if(corpus_name == 'matrix_1' or corpus_name == 'matrix1'):
         corpus = load_corpus("matrix_1")
         id2word = load_id2word("matrix_1")
@@ -160,7 +160,7 @@ def main():
         corpus = load_corpus("matrix_1")
         id2word = load_id2word("matrix_1")
     
-    compute_topic(corpus_name,corpus,num_topics,id2word,workers=workers)
+    compute_topic(corpus_name,corpus,num_topics,id2word,workers=workers,passes=passes)
     
 if __name__== "__main__":
     main()
