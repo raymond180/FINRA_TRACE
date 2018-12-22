@@ -11,5 +11,14 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem 32gb
 
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+
 source ~/miniconda3/bin/activate
-srun python ~/FINRA_TRACE/TopicModeling/main.py
+
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+
+srun python ~/FINRA_TRACE/TopicModeling/main_argument.py matrix_1 matrix_1 matrix_1 100
