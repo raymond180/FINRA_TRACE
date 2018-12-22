@@ -8,7 +8,7 @@
 #SBATCH --nodes=4
 #SBATCH --ntasks=4
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=48
+#SBATCH --cpus-per-task=32
 #SBATCH --mem 32gb
 
 export MKL_NUM_THREADS=1
