@@ -10,7 +10,7 @@ def main():
     corpus = load_corpus(corpus)
     id2word = load_id2word(id2word)
 	
-    compute_topic(corpus_name=corpus_name,corpus=corpus,num_topics=num_topics,id2word=id2word,workers=7)
+    compute_topic(corpus_name=corpus_name,corpus=corpus,num_topics=num_topics,id2word=id2word,workers=23,chunksize=25000,passes=60,iterations=1000)
 
 if __name__ == "__main__":
     main()
