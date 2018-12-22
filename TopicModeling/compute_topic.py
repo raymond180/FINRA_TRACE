@@ -99,7 +99,7 @@ def load_id2word(id2word_name):
     print("id2word loaded!!")
     return id2word
 
-def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=10000,passes=30,iterations=600):
+def compute_topic(corpus_name,corpus,num_topics,id2word,workers=3,chunksize=25000,passes=40,iterations=600):
     logs_directory = get_logs_directory()
     filename = "{}_{}topics.log".format(corpus_name,num_topics)
     log_filename = logs_directory / filename
