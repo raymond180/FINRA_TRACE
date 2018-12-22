@@ -6,8 +6,8 @@
 #SBATCH --time=24:00:00
 #SBATCH --qos=batch
 #SBATCH --ntasks=4
-#SBATCH --cpus-per-task=32
-#SBATCH --mem 32gb
+#SBATCH --cpus-per-task=24
+#SBATCH --mem 16gb
 
 export MKL_NUM_THREADS=1
 export NUMEXPR_NUM_THREADS=1
