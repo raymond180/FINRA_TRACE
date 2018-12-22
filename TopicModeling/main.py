@@ -7,7 +7,7 @@ def main():
     num_topics_array = [250,500,750]
     for num in num_topics_array:
         num_topics = num
-        compute_topic(corpus_name=corpus_name,corpus=corpus,num_topics=num_topics,id2word=id2word,workers=7)
+        compute_topic(corpus_name=corpus_name,corpus=corpus,num_topics=num_topics,id2word=id2word,workers=43)
 
 if __name__ == "__main__":
     main()
