@@ -3,7 +3,7 @@
 #SBATCH --job-name=topicModeling
 #SBATCH --output main.out.%j
 #SBATCH --error main.out.%j
-#SBATCH --time=72:00:00
+#SBATCH --time=48:00:00
 #SBATCH --qos=batch
 #SBATCH --nodes=4
 #SBATCH --ntasks=4
