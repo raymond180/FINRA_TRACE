@@ -41,8 +41,6 @@ def get_result_directory():
     """Return path of Result directory"""
     project_directory = get_project_directory()
     result_directory = project_directory / 'Result'
-    if not result_directory.is_dir():
-        create_directory(result_directory)
     return result_directory
     
 def get_data_directory():
