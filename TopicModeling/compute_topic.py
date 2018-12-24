@@ -21,6 +21,9 @@ def create_document(first,second):
 def create_document(first,second,third):
     return str(first) + ',' + str(second) + ',' + str(third)
 
+def document_date2year(date):
+    return str(date[0:4])
+
 def compute_Dc_v1(data):
     """Compute Dc_v1 which is count of bonds on given dealer and day"""
     create_document_vectorize = np.vectorize(create_document)
@@ -91,8 +94,10 @@ def compute_Dc_v3(data):
 def compute_Tc_v1(data):
     """Compute Tc_v1 which is a document will represent the triple (seller, bond, buyer, date) directly"""
     create_document_vectorize = np.vectorize(create_document)
+    document_date2year_vectorize = np.vectorize(document_date2year)
     print("creating documents ......")
     # Add new column Dc_v3 which is the string representation of report dealer buy on the specific day
+    data['document_date'] = document_date2year_vectorize(data['document_date'].values)
     data['Tc_v1_S_B_D'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['Contra_Party_Index'].values , data['document_date'].values)
     print("documents created!!")
     
