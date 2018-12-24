@@ -3,10 +3,12 @@ import pandas as pd
 import numpy as np
 import os
 from pathlib import Path
+import sys
 
 from manage_path import *
 
 def read_data(file_name,low_memory=False,memory_map=True,engine='c'):
+    """Read FINRA TRACE data and perform date conversion and data merging with Mergent FISD"""
     # Prepare data file path
     dataset_directory = get_dataset_directory()
     file_path = dataset_directory / file_name
@@ -31,13 +33,11 @@ def read_data(file_name,low_memory=False,memory_map=True,engine='c'):
     
     print('transforming data...')
     # Drop TRD_EXCTN_DTTM that is NaT
+    n_drop_rows = data['TRD_EXCTN_DTTM'].size - data['TRD_EXCTN_DTTM'].count()
     data.dropna(subset=['TRD_EXCTN_DTTM'],inplace=True)
+    print('{} of rows are dropped'.format(n_drop_rows))
     # Add new column document_date which is the date of TRD_EXCTN_DTTM
     data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(str)
-    # Add new column document_buy which is the string representation of report dealer buy on the specific day
-    data['document_sell'] = data.apply(lambda x: str(x['Report_Dealer_Index'])+ ',' +str(x['document_date'] + ',S') ,axis=1)
-    # Add new column document_sell which is the string representation of report dealer sell on the specific day
-    data['document_buy'] = data.apply(lambda x: str(x['Contra_Party_Index'])+ ',' +str(x['document_date'] + ',B') ,axis=1)
     print('transforming data done!!')
     
     # Get bond_issues
@@ -47,7 +47,6 @@ def read_data(file_name,low_memory=False,memory_map=True,engine='c'):
     bond_issues_dtype = {'ISSUER_ID':str , 'COMPLETE_CUSIP':str}
     bond_issues = pd.read_csv(bond_issues_path, usecols=bond_issues_fields , dtype=bond_issues_dtype \
                              , low_memory=low_memory, memory_map=memory_map)
-    
     # Get bond_issuers
     bond_issuer_path = dataset_directory / 'Mergent_FISD_Bonds_Issuers.csv'
     bond_issuer_fields = ['ISSUER_ID', 'AGENT_ID', 'CUSIP_NAME', 'INDUSTRY_GROUP','INDUSTRY_CODE', 'PARENT_ID', 'NAICS_CODE','SIC_CODE']
@@ -56,11 +55,9 @@ def read_data(file_name,low_memory=False,memory_map=True,engine='c'):
     bond_issuer = pd.read_csv(bond_issuer_path, usecols=bond_issuer_fields, encoding='cp1252', dtype=bond_issuer_dtype \
                              , low_memory=low_memory, memory_map=memory_map)
     
-    
     #bond_ratings_path = dataset_directory / 'Mergent_FISD_Bonds_Ratings.csv'
     #bond_ratings = pd.read_csv(bond_ratings_path)
-    
-    
+
     # Merge data with bond issues using complete cusip
     data = data.merge(bond_issues, left_on='CUSIP_ID', right_on='COMPLETE_CUSIP', how='left')
     # Then, merge data with bond issuers using ISSUER_ID
@@ -95,8 +92,8 @@ def load_data(file_name="TRACE2014_jinming.pkl"):
 
 def main():
     # Get file_name and pickle_name to be saved as
-    file_name = str(input("Please enter file_name: "))
-    pickle_name = str(input("Please enter pickle_name: "))
+    file_name = str(sys.argv[1])
+    pickle_name = str(sys.argv[2])
     
     print('Preparing data ...')
     data = read_data(file_name)
