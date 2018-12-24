@@ -176,6 +176,8 @@ def compute_id2word(matrix,matrix_name,save=True):
     if(save):
         print("saving id2word ...")
         id2word_directory = get_id2word_directory()
+        if not id2word_directory.is_dir():
+            create_directory(id2word_directory)
         file_name = id2word_directory / "{}.npy".format(matrix_name)
         # save the id2word using numpy
         np.save(file_name, id2word)
