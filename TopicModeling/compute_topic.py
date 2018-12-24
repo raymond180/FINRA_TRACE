@@ -15,10 +15,10 @@ import logging
 from get_data import load_data
 from manage_path import *
 
-def create_document(first,second):
+def create_document_2(first,second):
     return str(first) + ',' + str(second)
 
-def create_document(first,second,third):
+def create_document_3(first,second,third):
     return str(first) + ',' + str(second) + ',' + str(third)
 
 def document_date2year(date):
@@ -26,7 +26,7 @@ def document_date2year(date):
 
 def compute_Dc_v1(data):
     """Compute Dc_v1 which is count of bonds on given dealer and day"""
-    create_document_vectorize = np.vectorize(create_document)
+    create_document_vectorize = np.vectorize(create_document_2)
     print("creating documents ......")
     # Add new column Dc_v1_S which is the string representation of report dealer buy on the specific day
     data['Dc_v1_S'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['document_date'].values)
@@ -51,7 +51,7 @@ def compute_Dc_v1(data):
 
 def compute_Dc_v2(data):
     """Compute Dc_v2 which is count of bonds on given dealer and day seperated buy and sell"""
-    create_document_vectorize = np.vectorize(create_document)
+    create_document_vectorize = np.vectorize(create_document_3)
     print("creating documents ......")
     # Add new column Dc_v2_S which is the string representation of report dealer buy on the specific day
     data['Dc_v2_S'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['document_date'].values , 'S')
@@ -71,7 +71,7 @@ def compute_Dc_v2(data):
 
 def compute_Dc_v3(data):
     """Compute Dc_v2 which is count of bonds on given dealer and day seperated buy and sell"""
-    create_document_vectorize = np.vectorize(create_document)
+    create_document_vectorize = np.vectorize(create_document_3)
     print("creating documents ......")
     # Ignore Report_Dealer_Index that is '0' and Contra_Party_Index that is '99999'
     data = data.loc[(data['Report_Dealer_Index'] != '0') & (data['Contra_Party_Index'] != '99999')].copy()
@@ -93,7 +93,7 @@ def compute_Dc_v3(data):
 
 def compute_Tc_v1(data):
     """Compute Tc_v1 which is a document will represent the triple (seller, bond, buyer, date) directly"""
-    create_document_vectorize = np.vectorize(create_document)
+    create_document_vectorize = np.vectorize(create_document_3)
     document_date2year_vectorize = np.vectorize(document_date2year)
     print("creating documents ......")
     # Add new column Dc_v3 which is the string representation of report dealer buy on the specific day
