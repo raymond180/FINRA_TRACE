@@ -22,7 +22,7 @@ def load_model(model_name,num_topics):
     print('LDAModel loaded!!!')
     return lda
 
-def document_topic_distribution(corpus,matrix_object,model,num_topics,minimum_probability=0.10):
+def document_topic_distribution(corpus,matrix_object,model,model_name,num_topics,minimum_probability=0.10):
     print('caculating document_topic_distribution ...')
     # minimum_probability is our threshold
     document_topics = model.get_document_topics(corpus,minimum_probability=minimum_probability)
@@ -75,7 +75,7 @@ def main():
     if (model_name=='Tc_v1'):
         matrix_object = compute_Tc_v1(data)
 	# Save document_topic_distribution
-    document_topic_distribution(corpus,matrix_object,model,num_topics)
+    document_topic_distribution(corpus,matrix_object,model,model_name,num_topics)
 
 if __name__ == "__main__":
     main()
