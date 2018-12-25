@@ -44,6 +44,15 @@ def document_topic_distribution(matrix_object,model,num_topics,minimum_probabili
     document_topic_distribution_pandas.to_csv(file_name)
     print('document_topic_distribution saved!!!')
     
+def save_pyldavis2html(model,corpus,dictionary):
+    vis = pyLDAvis.gensim.prepare(model, corpus, dictionary, sort_topics=False)
+    result_directory = get_result_directory()
+    if not result_directory.is_dir():
+        create_directory(result_directory)
+    file_name = result_directory / '{}_{}topics.html'.format(model_name,num_topics)
+    # Save visualization
+    pyLDAvis.save_html(vis, file_name)
+    
 def main():
     model_name = str(sys.argv[1])
     num_topics = int(sys.argv[2])
@@ -53,12 +62,8 @@ def main():
     dictionary = Dictionary.from_corpus(corpus,id2word=id2word)
     # Load LDAModel
     model = load_model(model_name,num_topics)
-    vis = pyLDAvis.gensim.prepare(model, corpus, dictionary, sort_topics=False)
-    result_directory = get_result_directory()
-    file_name = result_directory / '{}_{}topics.html'.format(model_name,num_topics)
-    # Save visualization
-    pyLDAvis.save_html(vis, file_name)
-    
+    save_pyldavis2html(model, corpus, dictionary)
+
     # Load data to caculate matrix
     data = load_data()
     if (model_name=='Dc_v1'):
