@@ -20,12 +20,16 @@ export MKL_NUM_THREADS=1
 export NUMEXPR_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 
-srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v1 Dc_v1 Dc_v1 250 &
-srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v2 Dc_v2 Dc_v2 250 &
-srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v3 Dc_v3 Dc_v3 250 &
-srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Tc_v1 Tc_v1 Tc_v1 250 &
+#srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v1 Dc_v1 Dc_v1 250 &
+#srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v2 Dc_v2 Dc_v2 250 &
+#srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v3 Dc_v3 Dc_v3 250 &
+#srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Tc_v1 Tc_v1 Tc_v1 250 &
 
-wait
+#wait
+
+export MKL_NUM_THREADS=12
+export NUMEXPR_NUM_THREADS=12
+export OMP_NUM_THREADS=12
 
 srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v1 250 &
 srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v2 250 &

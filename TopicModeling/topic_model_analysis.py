@@ -11,15 +11,19 @@ from pathlib import Path
 
 # The model with model_name we want to load
 def load_model(model_name,num_topics):
+    """Load LDAModel for analysis"""
+    print('Loading LDAModel ....')
     topic_name ="_{}topics".format(num_topics)
     file_name = model_name + topic_name
     LDAModel_directory = get_LDAModel_directory()
     load_path = LDAModel_directory / "{}/{}".format(file_name,file_name)
     load_path = str(load_path)
     lda = gensim.models.ldamulticore.LdaMulticore.load(load_path)
+    print('LDAModel loaded!!!')
     return lda
 
 def document_topic_distribution(matrix_object,model,num_topics,minimum_probability=0.10):
+    print('caculating document_topic_distribution ...')
     # minimum_probability is our threshold
     document_topics = model.get_document_topics(corpus,minimum_probability=minimum_probability)
     # convert document_topics, which is a gesim corpus, to numpy array
@@ -30,12 +34,15 @@ def document_topic_distribution(matrix_object,model,num_topics,minimum_probabili
     document_topic_distribution_pandas = pd.DataFrame(data=document_topic_distribution_numpy,index=matrix_1.index,columns=np.arange(int(num_topics)))
     # Only get the top three topics per document
     document_topic_distribution_pandas = document_topic_distribution_pandas[document_topic_distribution_pandas.rank(axis=1,method='max',ascending=False) <= 3]
+    print('caculating document_topic_distribution done!!!')
     # Save the dataframe to csv
+    print('saving document_topic_distribution...')
     result_directory = get_result_directory()
     if not result_directory.is_dir():
         create_directory(result_directory)
     file_name = result_directory / '{}_{}topics.csv'.format(model_name,num_topics)
     document_topic_distribution_pandas.to_csv(file_name)
+    print('document_topic_distribution saved!!!')
     
 def main():
     model_name = str(sys.argv[1])
@@ -48,9 +55,9 @@ def main():
     model = load_model(model_name,num_topics)
     vis = pyLDAvis.gensim.prepare(model, corpus, dictionary, sort_topics=False)
     result_directory = get_result_directory()
-    file_name = result_directory + '{}_{}topics.html'.format(model_name,num_topics)
+    file_name = result_directory / '{}_{}topics.html'.format(model_name,num_topics)
     # Save visualization
-    pyLDAvis.save_html(vis, file_name) 
+    pyLDAvis.save_html(vis, file_name)
     
     # Load data to caculate matrix
     data = load_data()
