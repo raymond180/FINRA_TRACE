@@ -31,7 +31,7 @@ def document_topic_distribution(corpus,matrix_object,model,num_topics,minimum_pr
     # need to transpose it because gensim represents documents on columns token on index
     document_topic_distribution_numpy = np.transpose(document_topic_distribution_numpy)
     # combine document_topic_distribution with index from matrix and columns represents gensim topics
-    document_topic_distribution_pandas = pd.DataFrame(data=document_topic_distribution_numpy,index=matrix_1.index,columns=np.arange(int(num_topics)))
+    document_topic_distribution_pandas = pd.DataFrame(data=document_topic_distribution_numpy,index=matrix_object.index,columns=np.arange(int(num_topics)))
     # Only get the top three topics per document
     document_topic_distribution_pandas = document_topic_distribution_pandas[document_topic_distribution_pandas.rank(axis=1,method='max',ascending=False) <= 3]
     print('caculating document_topic_distribution done!!!')
