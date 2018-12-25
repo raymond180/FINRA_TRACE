@@ -51,7 +51,7 @@ def save_pyldavis2html(model,corpus,dictionary,model_name,num_topics):
         create_directory(result_directory)
     file_name = result_directory / '{}_{}topics.html'.format(model_name,num_topics)
     # Save visualization
-    pyLDAvis.save_html(vis, file_name)
+    pyLDAvis.save_html(vis, str(file_name))
     
 def main():
     model_name = str(sys.argv[1])
