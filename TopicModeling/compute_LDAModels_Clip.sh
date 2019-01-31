@@ -5,8 +5,8 @@
 #SBATCH --error main.out.%j
 #SBATCH --time=24:00:00
 #SBATCH --qos=batch
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --nodes=4
+#SBATCH --ntasks=4
 #SBATCH --cpus-per-task=24
 #SBATCH --mem 32gb
 
