@@ -42,6 +42,14 @@ def get_result_directory():
     project_directory = get_project_directory()
     result_directory = project_directory / 'Result'
     return result_directory
+
+def get_image_directory():
+    """Return path of Result directory"""
+    result_directory = get_result_directory()
+    image_directory = result_directory / 'image'
+    if not image_directory.is_dir():
+        create_directory(image_directory)
+    return image_directory
     
 def get_data_directory():
     """Return path of Data directory"""

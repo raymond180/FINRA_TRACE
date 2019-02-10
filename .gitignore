@@ -119,3 +119,5 @@ Data.rar
 *.zip
 
 Result/
+*.svg
+*.png

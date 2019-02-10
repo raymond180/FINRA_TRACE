@@ -9,6 +9,12 @@ from gensim.corpora import Dictionary
 import os
 from pathlib import Path
 
+import plotly
+import plotly.graph_objs as go
+import plotly.io as pio
+#from itertools import repeat
+from collections import deque
+
 # The model with model_name we want to load
 def load_model(model_name,num_topics):
     """Load LDAModel for analysis"""
@@ -44,6 +50,11 @@ def document_topic_distribution(corpus,matrix_object,model,model_name,num_topics
     document_topic_distribution_pandas.to_csv(file_name)
     print('document_topic_distribution saved!!!')
     
+def get_document_topic_distribution(model_name,num_topics):
+    result_directory = get_result_directory()
+    file_name = result_directory / '{}_{}topics.csv'.format(model_name,num_topics)
+    return file_name
+    
 def save_pyldavis2html(model,corpus,dictionary,model_name,num_topics):
     print('preparing pyLDAvis ...')
     vis = pyLDAvis.gensim.prepare(model, corpus, dictionary, sort_topics=False)
@@ -56,6 +67,43 @@ def save_pyldavis2html(model,corpus,dictionary,model_name,num_topics):
     # Save visualization
     pyLDAvis.save_html(vis, str(file_name))
     print('pyLDAvis to html saved!!!')
+
+def get_document_item(document,position):
+    return str(document).split(',')[position]
+
+def topicXtime_vusualize(topic_matrix,model_name):
+    def get_dealer_by_ID(matrix,dealer_id,model_name):
+        result = matrix.loc[matrix['dealer'] == dealer_id].copy().drop(labels='dealer',axis=1)
+        return (result,dealer_id,model_name)
+    
+    def topicXtime(dealer_data):
+        dealer_data,dealer_id,model_name = dealer_data[0],dealer_data[1],dealer_data[2]
+
+        heatmap_data = [
+            go.Heatmap(
+                z=dealer_data.values.tolist(),
+                zmin=0,
+                zmax=1,
+                x=dealer_data.columns,
+                y=dealer_data.index,
+                colorscale='Jet',
+            )
+        ]
+
+        layout = go.Layout(
+            title='{} Dealer {}: Topic-Time'.format(model_name,dealer_id),
+        )
+
+        fig = go.Figure(data=heatmap_data, layout=layout)
+
+        image_directory = get_image_directory() / '{}'.format(model_name)
+        if not image_directory.is_dir():
+            create_directory(image_directory)
+        file_path = image_directory / '{}_dealer{}_topic_time.svg'.format(model_name,dealer_id)
+        pio.write_image(fig, str(file_path))
+    
+    dealer_df_list = list(map(lambda x: get_dealer_by_ID(topic_matrix,x,model_name),list(topic_matrix['dealer'].unique())))
+    deque(map(topicXtime,dealer_df_list))
     
 def main():
     model_name = str(sys.argv[1])
