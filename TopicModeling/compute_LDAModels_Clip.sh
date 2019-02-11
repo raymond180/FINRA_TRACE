@@ -8,7 +8,7 @@
 #SBATCH --nodes=8
 #SBATCH --ntasks=8
 #SBATCH --cpus-per-task=24
-#SBATCH --mem 32gb
+#SBATCH --mem 64gb
 
 export MKL_NUM_THREADS=1
 export NUMEXPR_NUM_THREADS=1
