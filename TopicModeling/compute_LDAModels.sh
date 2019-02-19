@@ -3,11 +3,45 @@
 #SBATCH --job-name=topicModeling
 #SBATCH --output main.out.%j
 #SBATCH --error main.out.%j
-#SBATCH --time=08:00:00
-#SBATCH --qos=dpart
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem 16gb
+#SBATCH --time=24:00:00
+#SBATCH --qos=batch
+#SBATCH --nodes=8
+#SBATCH --ntasks=8
+#SBATCH --cpus-per-task=24
+#SBATCH --mem 64gb
+
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export OMP_NUM_THREADS=1
 
 source ~/miniconda3/bin/activate
-srun python ~/FINRA_TRACE/TopicModeling/main.py
+
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export OMP_NUM_THREADS=1
+
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v1 Dc_v1 Dc_v1 200 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v2 Dc_v2 Dc_v2 200 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v3 Dc_v3 Dc_v3 25 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Tc_v1 Tc_v1 Tc_v1 125 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v1 Dc_v1 Dc_v1 300 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v2 Dc_v2 Dc_v2 300 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Dc_v3 Dc_v3 Dc_v3 75 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_argument.py Tc_v1 Tc_v1 Tc_v1 200 &
+
+wait
+
+export MKL_NUM_THREADS=12
+export NUMEXPR_NUM_THREADS=12
+export OMP_NUM_THREADS=12
+
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v1 200 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v2 200 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v3 25 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Tc_v1 125 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v1 300 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v2 300 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v3 75 &
+srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Tc_v1 200 &
+
+wait
