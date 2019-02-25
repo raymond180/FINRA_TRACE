@@ -7,7 +7,7 @@
 #SBATCH --qos=batch
 #SBATCH --nodes=6
 #SBATCH --ntasks=6
-#SBATCH --cpus-per-task=24
+#SBATCH --cpus-per-task=16
 #SBATCH --mem 21gb
 
 export MKL_NUM_THREADS=1
@@ -31,9 +31,9 @@ srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/main_ar
 
 wait
 
-export MKL_NUM_THREADS=12
-export NUMEXPR_NUM_THREADS=12
-export OMP_NUM_THREADS=12
+export MKL_NUM_THREADS=8
+export NUMEXPR_NUM_THREADS=8
+export OMP_NUM_THREADS=8
 
 srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v4 50 &
 srun --nodes=1 --ntasks=1 --exclusive python ~/FINRA_TRACE/TopicModeling/topic_model_analysis.py Dc_v4 75 &
