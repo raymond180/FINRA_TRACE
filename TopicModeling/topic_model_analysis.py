@@ -98,7 +98,7 @@ def topicXtime_plotly_parallel(dealer_data):
     image_directory = get_image_directory() / '{}'.format(model_name)
     if not image_directory.is_dir():
          create_directory(image_directory)
-    file_path = image_directory / '{}_dealer{}_topic_time.svg'.format(model_name,dealer_id)
+    file_path = image_directory / '{}_dealer{}_topic_time.png'.format(model_name,dealer_id)
     pio.write_image(fig, str(file_path))
 
 
@@ -126,7 +126,7 @@ def topicXtime_plotly(topic_matrix,model_name):
         image_directory = get_image_directory() / '{}'.format(model_name)
         if not image_directory.is_dir():
             create_directory(image_directory)
-        file_path = image_directory / '{}_dealer{}_topic_time.svg'.format(model_name,dealer_id)
+        file_path = image_directory / '{}_dealer{}_topic_time.png'.format(model_name,dealer_id)
         pio.write_image(fig, str(file_path))
     
     dealer_df_list = list(map(lambda x: get_dealer_by_ID(topic_matrix,x,model_name),list(topic_matrix['dealer'].unique())))
@@ -180,6 +180,8 @@ def main():
         matrix_object = compute_Dc_v2(data)
     if (model_name=='Dc_v3'):
         matrix_object = compute_Dc_v3(data)
+    if (model_name=='Dc_v4'):
+        matrix_object = compute_Dc_v4(data)
     if (model_name=='Tc_v1'):
         matrix_object = compute_Tc_v1(data)
 	# Save document_topic_distribution

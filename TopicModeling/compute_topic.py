@@ -24,6 +24,20 @@ def create_document_3(first,second,third):
 def document_date2year(date):
     return str(date[0:4])
 
+def create_dummy_sink(Report_Dealer_Index,Contra_Party_Index):
+    """transform Report_Dealer_Index that are 0 for Dc_v4"""
+    if str(Report_Dealer_Index) == '0':
+        return 'D' + str(Contra_Party_Index)
+    else:
+        return str(Report_Dealer_Index)
+    
+def create_dummy_source(Report_Dealer_Index,Contra_Party_Index):
+    """transform Contra_Party_Index that are 99999 for Dc_v4"""
+    if str(Contra_Party_Index) == '99999':
+        return 'D' + str(Report_Dealer_Index)
+    else:
+        return str(Contra_Party_Index)
+
 def compute_Dc_v1(data):
     """Compute Dc_v1 which is count of bonds on given dealer and day"""
     create_document_vectorize = np.vectorize(create_document_2)
@@ -70,9 +84,10 @@ def compute_Dc_v2(data):
     return Dc_v2
 
 def compute_Dc_v3(data):
-    """Compute Dc_v2 which is count of bonds on given dealer and day seperated buy and sell"""
+    """Compute Dc_v3 which is count of bonds on given dealer and day seperated buy and sell"""
     create_document_vectorize = np.vectorize(create_document_3)
     print("creating documents ......")
+    
     # Ignore Report_Dealer_Index that is '0' and Contra_Party_Index that is '99999'
     data = data.loc[(data['Report_Dealer_Index'] != '0') & (data['Contra_Party_Index'] != '99999')].copy()
     # Add new column Dc_v3 which is the string representation of report dealer buy on the specific day
@@ -90,6 +105,31 @@ def compute_Dc_v3(data):
     Dc_v3 = Dc_v3.sort_index(axis=1)
     print("computing Dc_v3 done!")
     return Dc_v3
+
+def compute_Dc_v4(data):
+    """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell and create dummy Source and Sink for dealer who trade with them"""
+    create_document_vectorize = np.vectorize(create_document_3)
+    create_dummy_sink_vectorize = np.vectorize(create_dummy_sink)
+    create_dummy_source_vectorize = np.vectorize(create_dummy_source)
+    print("creating documents ......")
+    # Create Dummy source and sink for dealers
+    data['Report_Dealer_Index'] = create_dummy_sink_vectorize(data['Report_Dealer_Index'].values , data['Contra_Party_Index'].values)
+    data['Contra_Party_Index'] = create_dummy_source_vectorize(data['Report_Dealer_Index'].values , data['Contra_Party_Index'].values)
+    # Add new column Dc_v4 which is the string representation of report dealer buy on the specific day
+    data['Dc_v4_S'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['document_date'].values , 'S')
+    # Add new column Dc_v4 which is the string representation of report dealer sell on the specific day
+    data['Dc_v4_B'] = create_document_vectorize(data['Contra_Party_Index'].values , data['document_date'].values , 'B')
+    print("documents created!!")
+    
+    data_gb_sell = data.groupby(by=['Dc_v4_S','BOND_SYM_ID'])
+    data_gb_buy = data.groupby(by=['Dc_v4_B','BOND_SYM_ID'])
+    
+    print("computing Dc_v4 ......")
+    Dc_v4 = data_gb_sell['BOND_SYM_ID'].size().astype(np.int16).unstack(fill_value=0)
+    Dc_v4 = Dc_v4.append(data_gb_buy['BOND_SYM_ID'].size().astype(np.int16).unstack(fill_value=0))
+    Dc_v4 = Dc_v4.sort_index(axis=1)
+    print("computing Dc_v4 done!")
+    return Dc_v4
 
 def compute_Tc_v1(data):
     """Compute Tc_v1 which is a document will represent the triple (seller, bond, buyer, date) directly"""
