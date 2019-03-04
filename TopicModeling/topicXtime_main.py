@@ -22,6 +22,9 @@ def main():
     if (model_name=='Dc_v3'):
         topic_matrix['dealer'] = pd.Series(list(zip(get_document_item_vectorize(topic_matrix.index,0),get_document_item_vectorize(topic_matrix.index,2)))).values
         topic_matrix.index = pd.to_datetime(get_document_item_vectorize(topic_matrix.index,1))
+    if (model_name=='Dc_v4'):
+        topic_matrix['dealer'] = pd.Series(list(zip(get_document_item_vectorize(topic_matrix.index,0),get_document_item_vectorize(topic_matrix.index,2)))).values
+        topic_matrix.index = pd.to_datetime(get_document_item_vectorize(topic_matrix.index,1))
     if (model_name=='Tc_v1'):
         topic_matrix['dealer'] = pd.Series(list(zip(get_document_item_vectorize(topic_matrix.index,0),get_document_item_vectorize(topic_matrix.index,1)))).values
         topic_matrix.index = pd.to_datetime(get_document_item_vectorize(topic_matrix.index,2))
