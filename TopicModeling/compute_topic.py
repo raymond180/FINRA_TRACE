@@ -43,6 +43,18 @@ def client_to_delete(document):
         return 'delete'
     else:
         return 'keep'
+    
+def create_buy_document(Report_Dealer_Index,Contra_Party_Index,document_date):
+    if str(Report_Dealer_Index) == '0':
+        return str(Contra_Party_Index) + ',' + str(document_date) + ',' + 'BfC'
+    else:
+        return str(Contra_Party_Index) + ',' + str(document_date) + ',' + 'BfD'
+
+def create_sell_document(Report_Dealer_Index,Contra_Party_Index,document_date):
+    if str(Contra_Party_Index) == '99999':
+        return str(Report_Dealer_Index) + ',' + str(document_date) + ',' + 'StC'
+    else:
+        return str(Report_Dealer_Index) + ',' + str(document_date) + ',' + 'StD'
 
 def compute_Dc_v1(data):
     """Compute Dc_v1 which is count of bonds on given dealer and day"""
@@ -114,13 +126,14 @@ def compute_Dc_v3(data):
 
 def compute_Dc_v4(data):
     """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell"""
-    create_document_vectorize = np.vectorize(create_document_3)
+    create_buy_document_vectorize = np.vectorize(create_buy_document)
+    create_sell_document_vectorize = np.vectorize(create_sell_document)
     client_to_delete_vectorize = np.vectorize(client_to_delete)
     print("creating documents ......")
     # Add new column Dc_v4_S which is the string representation of report dealer buy on the specific day
-    data['Dc_v4_S'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['document_date'].values , 'S')
+    data['Dc_v4_S'] = create_buy_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
     # Add new column Dc_v4_B which is the string representation of report dealer sell on the specific day
-    data['Dc_v4_B'] = create_document_vectorize(data['Contra_Party_Index'].values , data['document_date'].values , 'B')
+    data['Dc_v4_B'] = create_sell_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
     print("documents created!!")
     
     data_gb_sell = data.groupby(by=['Dc_v4_S','BOND_SYM_ID'])
@@ -134,6 +147,9 @@ def compute_Dc_v4(data):
     print("flitering out general client in Dc_v4")
     Dc_v4['to_delete'] = client_to_delete_vectorize(Dc_v4.index)
     Dc_v4 = Dc_v4.loc[Dc_v4['to_delete']!='delete'].drop(['to_delete'],axis=1).copy()
+    Dc_v4 = Dc_v4[Dc_v4.sum(axis=1) > 3].copy()
+    Dc_v4.dropna(axis=1,how='all',inplace=True)
+    print("all done!")
     return Dc_v4
 
 def OLD_compute_Dc_v4(data):
@@ -208,13 +224,17 @@ def compute_matrix3():
 
 def compute_corpus(matrix,corpus_save_name,save=True):
     """Compute corpus given a matrix and save it"""
+    print("computing corpus...")
     corpus = gensim.matutils.Dense2Corpus(matrix.values,documents_columns=False)
+    print("corpus computed!!")
     if save:
+        print("saving corpus...")
         corpus_directory = get_corpus_directory()
         if not corpus_directory.is_dir():
             create_directory(corpus_directory)
         file_name = corpus_directory / "{}.mm".format(corpus_save_name)
         gensim.corpora.MmCorpus.serialize(str(file_name), corpus)
+        print("corpus saved!!")
     else:
         return corpus
 
@@ -238,11 +258,14 @@ def load_corpus(file_name):
     return corpus
 
 def compute_id2word(matrix,matrix_name,save=True):
+    """compute id2word of a matrix and save(return) the id2word as dictionary using numpy"""
+    print("computing id2word...")
     le = preprocessing.LabelEncoder()
     le.fit(matrix.columns)
     transform = le.transform(matrix.columns)
     inverse_transform = le.inverse_transform(transform)
     id2word = dict(zip(transform, inverse_transform))
+    print("id2word computed!!")
     if(save):
         print("saving id2word ...")
         id2word_directory = get_id2word_directory()

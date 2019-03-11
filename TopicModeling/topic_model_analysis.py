@@ -67,42 +67,17 @@ def save_pyldavis2html(model,corpus,dictionary,model_name,num_topics):
     # Save visualization
     pyLDAvis.save_html(vis, str(file_name))
     print('pyLDAvis to html saved!!!')
-
+    
 def get_document_item(document,position):
     return str(document).split(',')[position]
 
 def get_dealer_by_ID(matrix,dealer_id,model_name):
-        result = matrix.loc[matrix['dealer'] == dealer_id].copy().drop(labels='dealer',axis=1)
-        return (result,dealer_id,model_name)
-
-def topicXtime_plotly_parallel(dealer_data):
-    dealer_data,dealer_id,model_name = dealer_data[0],dealer_data[1],dealer_data[2]
-
-    heatmap_data = [
-        go.Heatmap(
-            z=dealer_data.values.tolist(),
-            zmin=0,
-            zmax=1,
-            x=dealer_data.columns,
-            y=dealer_data.index,
-            colorscale='Jet',
-        )
-     ]
-
-    layout = go.Layout(
-        title='{} Dealer {}: Topic-Time'.format(model_name,dealer_id),
-    )
-
-    fig = go.Figure(data=heatmap_data, layout=layout)
-
-    image_directory = get_image_directory() / '{}'.format(model_name)
-    if not image_directory.is_dir():
-         create_directory(image_directory)
-    file_path = image_directory / '{}_dealer{}_topic_time.png'.format(model_name,dealer_id)
-    pio.write_image(fig, str(file_path))
-
+    """get a subset of matrix given a dealerID"""
+    result = matrix.loc[matrix['dealer'] == dealer_id].copy().drop(labels='dealer',axis=1)
+    return (result,dealer_id,model_name)
 
 def topicXtime_plotly(topic_matrix,model_name):
+    """plot topic evolution across time (topicXtime) of a dealer"""
     def topicXtime(dealer_data):
         dealer_data,dealer_id,model_name = dealer_data[0],dealer_data[1],dealer_data[2]
 
@@ -132,7 +107,35 @@ def topicXtime_plotly(topic_matrix,model_name):
     dealer_df_list = list(map(lambda x: get_dealer_by_ID(topic_matrix,x,model_name),list(topic_matrix['dealer'].unique())))
     deque(map(topicXtime,dealer_df_list))
     
+def topicXtime_plotly_parallel(dealer_data):
+    """paralle version of topicXtime_plotly"""
+    dealer_data,dealer_id,model_name = dealer_data[0],dealer_data[1],dealer_data[2]
+
+    heatmap_data = [
+        go.Heatmap(
+            z=dealer_data.values.tolist(),
+            zmin=0,
+            zmax=1,
+            x=dealer_data.columns,
+            y=dealer_data.index,
+            colorscale='Jet',
+        )
+     ]
+
+    layout = go.Layout(
+        title='{} Dealer {}: Topic-Time'.format(model_name,dealer_id),
+    )
+
+    fig = go.Figure(data=heatmap_data, layout=layout)
+
+    image_directory = get_image_directory() / '{}'.format(model_name)
+    if not image_directory.is_dir():
+         create_directory(image_directory)
+    file_path = image_directory / '{}_dealer{}_topic_time.png'.format(model_name,dealer_id)
+    pio.write_image(fig, str(file_path))
+    
 def topicXtime_matplotlib(df,dealer_id,matrix_name):
+    """plot topicXtime of a dealer with matplotlib, used when plotly doesn't work"""
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
 
