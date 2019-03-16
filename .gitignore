@@ -104,21 +104,17 @@ venv.bak/
 .mypy_cache/
 
 *.xlsx
-
 *.docx
-
 *.csv
+*.rar
+*.npy
+*.zip
+*.svg
+*.png
+*.html
 
 Data/
 LDAModel/
 Data.rar
-
-
-*.rar
-*.npy
-*.zip
-
 Result/
-*.svg
-*.png
-*.html
+DSMM2019/

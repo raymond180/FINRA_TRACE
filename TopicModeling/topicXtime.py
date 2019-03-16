@@ -33,12 +33,13 @@ def main():
     if (model_name=='Tc_v1'):
         topic_matrix['dealer'] = pd.Series(list(zip(get_document_item_vectorize(topic_matrix.index,0),get_document_item_vectorize(topic_matrix.index,1)))).values
         topic_matrix.index = pd.to_datetime(get_document_item_vectorize(topic_matrix.index,2))
-    
+    """
     #transform 0-based index to 1-based indexing for readability
     increment_topic_dict = {}
     for i in range(len(topic_matrix.columns)):
         increment_topic_dict[str(i)] = str(i+1)
     topic_matrix.rename(columns=increment_topic_dict,inplace=True)
+    """
     print('data transformed!!')
     print('creating plots...')
     dealer_df_list = list(map(lambda x: get_dealer_by_ID(topic_matrix,x,model_name),list(topic_matrix['dealer'].unique())))
