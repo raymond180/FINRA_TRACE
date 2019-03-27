@@ -74,7 +74,8 @@ def get_document_item(document,position):
 def get_dealer_by_ID(matrix,dealer_id,model_name):
     """get a subset of matrix given a dealerID"""
     result = matrix.loc[matrix['dealer'] == dealer_id].copy().drop(labels='dealer',axis=1)
-    return (result,dealer_id,model_name)
+    trading_days = matrix.index.unique()
+    return (result,dealer_id,model_name,trading_days)
 
 def topicXtime_plotly(topic_matrix,model_name):
     """plot topic evolution across time (topicXtime) of a dealer"""
@@ -109,8 +110,9 @@ def topicXtime_plotly(topic_matrix,model_name):
     
 def topicXtime_plotly_parallel(dealer_data):
     """paralle version of topicXtime_plotly"""
-    dealer_data,dealer_id,model_name = dealer_data[0],dealer_data[1],dealer_data[2]
-
+    dealer_data,dealer_id,model_name,trading_days = dealer_data[0],dealer_data[1],dealer_data[2],dealer_data[3]
+    dealer_data = dealer_data.reindex(trading_days, fill_value=np.nan).sort_index()
+    
     heatmap_data = [
         go.Heatmap(
             z=dealer_data.values.tolist(),
@@ -163,6 +165,95 @@ def topicXtime_matplotlib(df,dealer_id,matrix_name):
     file_path = image_directory / '{}_dealer{}_topic_time.png'.format(matrix_name,dealer_id)
     plt.savefig(str(file_path), dpi=400)
     plt.close(fig)
+    
+def create_sankey_matrix(Dc_matrix,threshold,topic_selection=None):
+    """Create the target to source matrix needed to plot Sankey diagram with Plotly"""
+    #Get the sum of probability weighting groupby dealer divide by 250 trading days in a year
+    Dc_dealerXtopic_sum = Dc_matrix.groupby(by='dealer').sum() / 250
+    Dc_dealerXtopic_sum.index = Dc_dealerXtopic_sum.index.format()
+    Dc_dealerXtopic_sum = pd.DataFrame(Dc_dealerXtopic_sum.stack().reset_index().rename({'level_0':'dealer','level_1':'topicID',0:'values'},axis=1))
+    Dc_dealerXtopic_sum = Dc_dealerXtopic_sum[Dc_dealerXtopic_sum['values']>threshold].copy()
+    Dc_dealerXtopic_sum['B/S'] = Dc_dealerXtopic_sum.apply(lambda x: str(x['dealer']).split(',')[1][1:-1] ,axis=1)
+    Dc_dealerXtopic_sum['dealer'] = Dc_dealerXtopic_sum.apply(lambda x: str(x['dealer']).split(',')[0][1:] ,axis=1)
+    if not topic_selection:
+        pass
+    else:
+        Dc_dealerXtopic_sum = Dc_dealerXtopic_sum[Dc_dealerXtopic_sum['topicID'].isin([str(x) for x in topic_selection])]
+    #Sort this way to allow correct order of position
+    Dc_dealerXtopic_sum = Dc_dealerXtopic_sum.sort_values(by=['topicID','dealer'])
+    #Encode all dealers and topics to allow correct order of position in all cases
+    from sklearn import preprocessing
+    dealer_le = preprocessing.LabelEncoder()
+    dealer_le.fit(Dc_dealerXtopic_sum['dealer'])
+    dealer_transform = dealer_le.transform(Dc_dealerXtopic_sum['dealer'])
+    dealer_inverse_transform = dealer_le.inverse_transform(dealer_transform)
+    topic_le = preprocessing.LabelEncoder()
+    topic_le.fit(Dc_dealerXtopic_sum['topicID'])
+    topic_transform = topic_le.transform(Dc_dealerXtopic_sum['topicID'])
+    topic_inverse_transform = topic_le.inverse_transform(topic_transform)
+    #Adjust dealer_label_position
+    Dc_dealerXtopic_sum['dealer_encoding'] = dealer_transform
+    topicID_size = Dc_dealerXtopic_sum['topicID'].nunique()
+    Dc_dealerXtopic_sum['dealer_label_position'] = Dc_dealerXtopic_sum.apply(lambda x: x['dealer_encoding'] + topicID_size, axis=1)
+    Dc_dealerXtopic_sum['topic_encoding'] = topic_transform
+    Dc_dealerXtopic_sum['topic_position'] = topic_transform
+    return Dc_dealerXtopic_sum
+
+def plot_sankey(Dc_dealerXtopic_sum,title):
+    # Create Node labels
+    topic_label = list(Dc_dealerXtopic_sum['topicID'].unique())
+    dealer_label = list(Dc_dealerXtopic_sum.sort_values(by=['dealer_encoding'])['dealer'].unique())
+    label = []
+    label.extend(topic_label)
+    label.extend(dealer_label)
+    # Create Node Label's Colors
+    label_color = len(topic_label)*['black',]
+    label_color.extend(len(dealer_label)*['black',])
+    # Create Link Colors based on B/S
+    link_color_dict={
+        'BfD':'#D2A400', #Yellow
+        'BfC':'#009B00', #Green
+        'StD':'#0042FD', #Blue
+        'StC':'#CA0068', #Red
+    }
+    Dc_dealerXtopic_sum['link_color'] = Dc_dealerXtopic_sum['B/S'].apply(lambda x:link_color_dict[x])
+
+    data = dict(
+        type='sankey',
+        orientation = "h",
+        valueformat = ".4f",
+        node = dict(
+          pad = 100,
+          thickness = 30,
+          line = dict(
+            color = "black",
+            width = 0.5
+          ),
+          label = label,
+          color = label_color
+        ),
+        link = dict(
+          source = Dc_dealerXtopic_sum['dealer_label_position'],
+          target = Dc_dealerXtopic_sum['topic_position'],
+          value = Dc_dealerXtopic_sum['values'],
+          #label = inverse_transform
+          color = Dc_dealerXtopic_sum['link_color']
+      ))
+
+    #title = str("Dc_v4_75topics_THRESHOLD={}").format(threshold)
+    layout =  dict(
+        title = title,
+        font = dict(
+          size = 20
+        ),
+        width=1000,#750
+        height=2000,#1000
+    )
+
+    fig = dict(data=[data], layout=layout)
+    #plotly.offline.iplot(fig, validate=False)
+    pio.write_image(fig, "{}.png".format(title))
+    plotly.offline.plot(fig, filename =  "{}.html".format(title), auto_open=False)
     
 def main():
     model_name = str(sys.argv[1])

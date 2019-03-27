@@ -152,6 +152,34 @@ def compute_Dc_v4(data):
     print("all done!")
     return Dc_v4
 
+def compute_Dc_v4_test(data):
+    """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell"""
+    create_buy_document_vectorize = np.vectorize(create_buy_document)
+    create_sell_document_vectorize = np.vectorize(create_sell_document)
+    client_to_delete_vectorize = np.vectorize(client_to_delete)
+    print("creating documents ......")
+    # Add new column Dc_v4_S which is the string representation of report dealer buy on the specific day
+    data['Dc_v4_S'] = create_buy_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    # Add new column Dc_v4_B which is the string representation of report dealer sell on the specific day
+    data['Dc_v4_B'] = create_sell_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    print("documents created!!")
+    
+    data_gb_sell = data.groupby(by=['Dc_v4_S','BOND_SYM_ID'])
+    data_gb_buy = data.groupby(by=['Dc_v4_B','BOND_SYM_ID'])
+    
+    print("computing Dc_v4 ......")
+    Dc_v4 = data_gb_sell['BOND_SYM_ID'].size().astype(np.int16).unstack(fill_value=0)
+    Dc_v4 = Dc_v4.append(data_gb_buy['BOND_SYM_ID'].size().astype(np.int16).unstack(fill_value=0))
+    Dc_v4 = Dc_v4.sort_index(axis=1)
+    print("computing Dc_v4 done!")
+    print("flitering out general client in Dc_v4")
+    Dc_v4['to_delete'] = client_to_delete_vectorize(Dc_v4.index)
+    #Dc_v4 = Dc_v4.loc[Dc_v4['to_delete']!='delete'].drop(['to_delete'],axis=1).copy()
+    #Dc_v4 = Dc_v4[Dc_v4.sum(axis=1) > 3].copy()
+    #Dc_v4.dropna(axis=1,how='all',inplace=True)
+    print("all done!")
+    return Dc_v4
+
 def OLD_compute_Dc_v4(data):
     """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell and create dummy Source and Sink for dealer who trade with them"""
     create_document_vectorize = np.vectorize(create_document_3)
