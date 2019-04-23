@@ -136,7 +136,47 @@ def topicXtime_plotly_parallel(dealer_data):
     file_path = image_directory / '{}_dealer{}_topic_time.png'.format(model_name,dealer_id)
     pio.write_image(fig, str(file_path))
     
-def topicXtime_matplotlib(df,dealer_id,matrix_name):
+def topicXtime_matplotlib(dealer_data):
+    """paralle plotting topicXtime using matplotlib"""
+    import matplotlib.pyplot as plt
+    # Get and set data
+    dealer_data,dealer_id,model_name,trading_days = dealer_data[0],dealer_data[1],dealer_data[2],dealer_data[3]
+    dealer_data = dealer_data.reindex(trading_days, fill_value=np.nan).sort_index()
+    # Initialize figure
+    fig, ax = plt.subplots()
+    im = ax.imshow(dealer_data,plt.get_cmap("jet"),aspect='auto',vmin=0,vmax=1)
+    # We want to show every 10 topics
+    ax.set_xticks(np.arange(0,len(dealer_data.columns),10))
+    # We want to show every 22 days (that's a month)
+    ax.set_yticks(np.arange(0,len(dealer_data.index.date),22))
+    # ... and label them with the respective list entries
+    ax.set_xticklabels(dealer_data.columns[::10])
+    ax.set_yticklabels(dealer_data.index.date[::22])
+    # Set axis labels
+    ax.set_xlabel('Topic ID', fontsize=10)
+    ax.set_ylabel('Time', fontsize=10)
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+    # Set color bar
+    cbar = ax.figure.colorbar(im, ax=ax)
+    cbar.ax.set_ylabel("probability weighting", rotation=-90, va="bottom")
+    cbar.set_clim(0,1)
+    # Set title
+    ax.set_title('{} Dealer {}: Topic-Time'.format(model_name,dealer_id))
+    fig.tight_layout()
+    # Set grid
+    ax.grid(which="major", color="#e5e7e9", linestyle='-', linewidth=0.5)
+    # Save fig
+    image_directory = get_image_directory() / '{}'.format(model_name)
+    if not image_directory.is_dir():
+         create_directory(image_directory)
+    file_path = image_directory / '{}_dealer{}_topic_time.png'.format(model_name,dealer_id)
+    fig.savefig(str(file_path),dpi=300)
+    # Close fig
+    plt.close(fig)
+
+def old_topicXtime_matplotlib(df,dealer_id,matrix_name):
     """plot topicXtime of a dealer with matplotlib, used when plotly doesn't work"""
     import matplotlib.pyplot as plt
     import matplotlib.dates as mdates
@@ -165,7 +205,7 @@ def topicXtime_matplotlib(df,dealer_id,matrix_name):
     file_path = image_directory / '{}_dealer{}_topic_time.png'.format(matrix_name,dealer_id)
     plt.savefig(str(file_path), dpi=400)
     plt.close(fig)
-    
+
 def create_sankey_matrix(Dc_matrix,threshold,topic_selection=None):
     """Create the target to source matrix needed to plot Sankey diagram with Plotly"""
     #Get the sum of probability weighting groupby dealer divide by 250 trading days in a year
@@ -199,7 +239,7 @@ def create_sankey_matrix(Dc_matrix,threshold,topic_selection=None):
     Dc_dealerXtopic_sum['topic_position'] = topic_transform
     return Dc_dealerXtopic_sum
 
-def plot_sankey(Dc_dealerXtopic_sum,title):
+def plot_sankey(Dc_dealerXtopic_sum,title,width=1000,height=2000):
     # Create Node labels
     topic_label = list(Dc_dealerXtopic_sum['topicID'].unique())
     dealer_label = list(Dc_dealerXtopic_sum.sort_values(by=['dealer_encoding'])['dealer'].unique())
@@ -211,10 +251,10 @@ def plot_sankey(Dc_dealerXtopic_sum,title):
     label_color.extend(len(dealer_label)*['black',])
     # Create Link Colors based on B/S
     link_color_dict={
-        'BfD':'#D2A400', #Yellow
-        'BfC':'#009B00', #Green
-        'StD':'#0042FD', #Blue
-        'StC':'#CA0068', #Red
+        'BfD':'darkred',
+        'BfC':'#0042FD', #Blue
+        'StD':'#ff00ff', #Fuchsia
+        'StC':'#009B00', #Green
     }
     Dc_dealerXtopic_sum['link_color'] = Dc_dealerXtopic_sum['B/S'].apply(lambda x:link_color_dict[x])
 
@@ -246,8 +286,8 @@ def plot_sankey(Dc_dealerXtopic_sum,title):
         font = dict(
           size = 20
         ),
-        width=1000,#750
-        height=2000,#1000
+        width=width,#750
+        height=height,#1000
     )
 
     fig = dict(data=[data], layout=layout)

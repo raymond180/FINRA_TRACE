@@ -45,7 +45,8 @@ def main():
     dealer_df_list = list(map(lambda x: get_dealer_by_ID(topic_matrix,x,model_name),list(topic_matrix['dealer'].unique())))
     cpu_cores = multiprocessing.cpu_count() - 1
     pool = multiprocessing.Pool(cpu_cores)
-    pool.map(topicXtime_plotly_parallel,dealer_df_list)
+    #pool.map(topicXtime_plotly_parallel,dealer_df_list)
+    pool.map(topicXtime_matplotlib,dealer_df_list)
     pool.close()
     print('plots created!!')
     
