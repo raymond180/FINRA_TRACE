@@ -1,5 +1,5 @@
 from manage_path import *
-from compute_topic import *
+from compute_lda import *
 from get_data import *
 
 import gensim
@@ -318,7 +318,7 @@ def main():
         matrix_object = compute_Dc_v4(data)
     if (model_name=='Tc_v1'):
         matrix_object = compute_Tc_v1(data)
-	# Save document_topic_distribution
+    # Save document_topic_distribution
     document_topic_distribution(corpus,matrix_object,model,model_name,num_topics)
 
 if __name__ == "__main__":

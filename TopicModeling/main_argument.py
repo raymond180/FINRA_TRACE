@@ -1,4 +1,4 @@
-from compute_topic import load_corpus,load_id2word,compute_topic
+from compute_lda import load_corpus,load_id2word,compute_topic
 import sys
 
 def main():
