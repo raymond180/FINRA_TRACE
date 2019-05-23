@@ -55,6 +55,22 @@ def create_sell_document(Report_Dealer_Index,Contra_Party_Index,document_date):
         return str(Report_Dealer_Index) + ',' + str(document_date) + ',' + 'StC'
     else:
         return str(Report_Dealer_Index) + ',' + str(document_date) + ',' + 'StD'
+    
+def create_buy_document_no_source(Report_Dealer_Index,Contra_Party_Index,document_date):
+    if str(Report_Dealer_Index) == '0':
+        return str(Contra_Party_Index) + ',' + str(document_date) + ',' + 'BfC'
+    elif str(Contra_Party_Index) == '99999':
+        return np.nan
+    else:
+        return str(Contra_Party_Index) + ',' + str(document_date) + ',' + 'BfD'
+
+def create_sell_document_no_source(Report_Dealer_Index,Contra_Party_Index,document_date):
+    if str(Contra_Party_Index) == '99999':
+        return str(Report_Dealer_Index) + ',' + str(document_date) + ',' + 'StC'
+    elif str(Report_Dealer_Index) == '0':
+        return np.nan
+    else:
+        return str(Report_Dealer_Index) + ',' + str(document_date) + ',' + 'StD'
 
 def compute_Dc_v1(data):
     """Compute Dc_v1 which is count of bonds on given dealer and day"""
@@ -131,9 +147,9 @@ def compute_Dc_v4(data):
     client_to_delete_vectorize = np.vectorize(client_to_delete)
     print("creating documents ......")
     # Add new column Dc_v4_S which is the string representation of report dealer buy on the specific day
-    data['Dc_v4_S'] = create_buy_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    data['Dc_v4_S'] = create_sell_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
     # Add new column Dc_v4_B which is the string representation of report dealer sell on the specific day
-    data['Dc_v4_B'] = create_sell_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    data['Dc_v4_B'] = create_buy_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
     print("documents created!!")
     
     data_gb_sell = data.groupby(by=['Dc_v4_S','BOND_SYM_ID'])
