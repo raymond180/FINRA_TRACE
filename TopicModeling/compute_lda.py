@@ -491,7 +491,7 @@ def main():
     corpus = compute_corpus(bag_of_words,save_name)
     id2word = compute_id2word(bag_of_words,save_name)
     # Run Gensim LDA
-    lda = compute_topic(save_name,corpus,num_topics,id2word)
+    lda = compute_topic(save_name,corpus,num_topics,id2word,workers=11,chunksize=12500,passes=60,iterations=1000)
     # ---------------- LDA Analysis  ----------------
     os.environ["MKL_NUM_THREADS"] = "4"
     os.environ["NUMEXPR_NUM_THREADS"] = "4"
