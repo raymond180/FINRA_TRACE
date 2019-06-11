@@ -478,7 +478,7 @@ def main():
     # Load data
     data = load_pickle("FINRA_TRACE_2015.pkl.zip")
     data = data.append(load_pickle("FINRA_TRACE_2014.pkl.zip"),ignore_index=True)
-    data = data.append(load_pickle("FINRA_TRACE_2013.pkl.zip"),ignore_index=True)
+    #data = data.append(load_pickle("FINRA_TRACE_2013.pkl.zip"),ignore_index=True)
     #data = data.append(load_pickle("FINRA_TRACE_2012.pkl.zip"),ignore_index=True)
     # Compute a version of bag_of_words given the save_name
     if save_name=="trade_vol_BoW":
