@@ -177,7 +177,7 @@ def trade_vol_BoW(data,cap="large"):
     data_gb_buy = data[data['trade_vol_BoW_B']!='nan'].groupby(by=['trade_vol_BoW_B','BOND_SYM_ID'])
     
     print("computing bag_of_words ......")
-    bag_of_words = data_gb_sell['price'].sum().astype(np.int32).unstack(level=-1,fill_value=0).to_sparse()
+    bag_of_words = data_gb_sell['price'].sum().astype(np.int32).unstack(level=-1).to_sparse()
     bag_of_words = bag_of_words.append(data_gb_buy['price'].sum().astype(np.int32).unstack(level=-1).to_sparse())
     bag_of_words = bag_of_words.sort_index(axis=1)
     print("computing bag_of_words done!")
