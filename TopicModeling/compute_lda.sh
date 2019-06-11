@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=topicModeling
-#SBATCH --output main.out.%j
-#SBATCH --error main.out.%j
+#SBATCH --output %j.out.txt
+#SBATCH --error %j.out.txt
 #SBATCH --time=24:00:00
 #SBATCH --qos=batch
 #SBATCH --nodes=8
