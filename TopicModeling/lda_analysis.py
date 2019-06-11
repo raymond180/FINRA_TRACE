@@ -1,6 +1,9 @@
 from manage_path import *
-from compute_lda import *
+#from compute_lda import *
 from get_data import *
+
+import pandas as pd
+import numpy as np
 
 import gensim
 import pyLDAvis.gensim

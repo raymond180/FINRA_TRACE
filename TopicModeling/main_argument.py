@@ -7,7 +7,7 @@ def main():
     id2word = str(sys.argv[2])
     corpus_name = str(sys.argv[3])
     num_topics = int(sys.argv[4])
-	
+
     corpus = load_corpus(corpus)
     id2word = load_id2word(id2word)
     compute_topic(corpus_name=corpus_name,corpus=corpus,num_topics=num_topics \
