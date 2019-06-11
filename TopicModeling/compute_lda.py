@@ -176,8 +176,8 @@ def trade_vol_BoW(data,cap="large"):
     data_gb_buy = data[data['trade_vol_BoW_B']!='nan'].groupby(by=['trade_vol_BoW_B','BOND_SYM_ID'])
     
     print("computing bag_of_words ......")
-    bag_of_words = data_gb_sell['price'].sum().astype(np.float64).unstack()
-    bag_of_words = bag_of_words.append(data_gb_buy['price'].sum().astype(np.float64).unstack())
+    bag_of_words = data_gb_sell['price'].sum().astype(np.float64).unstack(level=0)
+    bag_of_words = bag_of_words.append(data_gb_buy['price'].sum().astype(np.float64).unstack(level=0))
     bag_of_words = bag_of_words.sort_index(axis=1)
     print("computing bag_of_words done!")
     return bag_of_words
@@ -259,7 +259,10 @@ def compute_corpus(bag_of_words,corpus_save_name,save=True):
     """Compute corpus given a bag_of_words and save it"""
     print("computing corpus...")
     bag_of_words = bag_of_words.fillna(0)
-    corpus = gensim.matutils.Dense2Corpus(bag_of_words.values,documents_columns=False)
+    # For level=-1
+    #corpus = gensim.matutils.Dense2Corpus(bag_of_words.values,documents_columns=False)
+    # For level=0
+    corpus = gensim.matutils.Dense2Corpus(bag_of_words.values,documents_columns=True)
     print("corpus computed!!")
     if save:
         print("saving corpus...")
