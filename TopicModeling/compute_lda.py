@@ -158,6 +158,7 @@ def trade_vol_BoW(data,cap="large"):
     cap_threshold = 10000
     if cap=="large":
         data = data[data['price'] >= cap_threshold]
+        data['price'] = data['price'] / cap_threshold
     else:
         data = data[data['price'] < cap_threshold]
     data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
@@ -176,8 +177,8 @@ def trade_vol_BoW(data,cap="large"):
     data_gb_buy = data[data['trade_vol_BoW_B']!='nan'].groupby(by=['trade_vol_BoW_B','BOND_SYM_ID'])
     
     print("computing bag_of_words ......")
-    bag_of_words = data_gb_sell['price'].sum().astype(np.float32).unstack(level=-1)
-    bag_of_words = bag_of_words.append(data_gb_buy['price'].sum().astype(np.float32).unstack(level=-1))
+    bag_of_words = data_gb_sell['price'].sum().astype(np.int32).unstack(level=-1)
+    bag_of_words = bag_of_words.append(data_gb_buy['price'].sum().astype(np.int32).unstack(level=-1))
     bag_of_words = bag_of_words.sort_index(axis=1)
     print("computing bag_of_words done!")
     return bag_of_words
