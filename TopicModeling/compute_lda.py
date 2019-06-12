@@ -468,9 +468,9 @@ def topicXtime_matplotlib(dealer_data):
     
 def main():
     # ---------------- Set MLK Enviroment Variables for better Gensim LDA performance  ----------------
-    #os.environ["MKL_NUM_THREADS"] = "1"
-    #os.environ["NUMEXPR_NUM_THREADS"] = "1"
-    #os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
+    os.environ["NUMEXPR_NUM_THREADS"] = "1"
+    os.environ["OMP_NUM_THREADS"] = "1"
     # ---------------- Prepare LDA Inputs & Run LDA ----------------
     # Parse command line args
     save_name = str(sys.argv[1])
@@ -484,6 +484,7 @@ def main():
     # Compute a version of bag_of_words given the save_name
     if save_name=="trade_vol_BoW":
         bag_of_words = trade_vol_BoW(data,cap)
+        del data
         save_name = save_name + "_" + cap
     else:
         print("the save_name does not have a corresponding bag_of_words")
@@ -491,11 +492,11 @@ def main():
     corpus = compute_corpus(bag_of_words,save_name)
     id2word = compute_id2word(bag_of_words,save_name)
     # Run Gensim LDA
-    lda = compute_topic(save_name,corpus,num_topics,id2word,workers=3,chunksize=12500,passes=60,iterations=1000)
+    lda = compute_topic(save_name,corpus,num_topics,id2word,workers=11,chunksize=12500,passes=40,iterations=600)
     # ---------------- LDA Analysis  ----------------
-    os.environ["MKL_NUM_THREADS"] = "4"
-    os.environ["NUMEXPR_NUM_THREADS"] = "4"
-    os.environ["OMP_NUM_THREADS"] = "4"
+    #os.environ["MKL_NUM_THREADS"] = "4"
+    #os.environ["NUMEXPR_NUM_THREADS"] = "4"
+    #os.environ["OMP_NUM_THREADS"] = "4"
     # Run PyLDAvis
     dictionary = Dictionary.from_corpus(corpus,id2word=id2word)
     save_pyldavis2html(lda, corpus, dictionary,save_name,num_topics)
