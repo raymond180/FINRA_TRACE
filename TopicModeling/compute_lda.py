@@ -189,6 +189,7 @@ def compute_Dc_v4(data):
     create_sell_document_vectorize = np.vectorize(create_sell_document)
     client_to_delete_vectorize = np.vectorize(client_to_delete)
     print("creating documents ......")
+    data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
     # Add new column Dc_v4_S which is the string representation of report dealer buy on the specific day
     data['Dc_v4_S'] = create_sell_document_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
     # Add new column Dc_v4_B which is the string representation of report dealer sell on the specific day
