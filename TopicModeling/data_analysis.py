@@ -26,7 +26,7 @@ def merge_finra_fisd(data):
     return data
 
 def produce_bonds_info(data):
-    bonds_info = data.drop_duplicates(subset=['BOND_SYM_ID'])
+    bonds_info = data.drop_duplicates(subset=['BOND_SYM_ID']).copy()
     bonds_info = bonds_info[['BOND_SYM_ID', 'CUSIP_ID','ISSUER_ID', 'COMPLETE_CUSIP', 'AGENT_ID', 'CUSIP_NAME','INDUSTRY_GROUP', 'INDUSTRY_CODE', 'PARENT_ID', 'NAICS_CODE','SIC_CODE']].copy()
     bonds_info.to_csv('bonds_info.csv')
 
