@@ -38,6 +38,7 @@ def main():
     # Load data
     data = load_pickle("FINRA_TRACE_2015.pkl.zip")
     data = data.append(load_pickle("FINRA_TRACE_2014.pkl.zip"),ignore_index=True)
+    data = merge_finra_fisd(data)
     produce_bonds_info(data)
     
 if __name__== "__main__":
