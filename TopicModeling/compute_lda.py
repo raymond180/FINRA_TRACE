@@ -183,6 +183,38 @@ def trade_vol_BoW(data,cap="large"):
     print("computing bag_of_words done!")
     return bag_of_words
 
+def trade_vol_BoW_norm(data,cap="large"):
+    """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell"""
+    data['price'] = (data['ENTRD_VOL_QT'] * data['RPTD_PR'])/100
+    cap_threshold = 10000
+    if cap=="large":
+        data = data[data['price'] >= cap_threshold]
+        data['price'] = data['price'] / cap_threshold
+    else:
+        data = data[data['price'] < cap_threshold]
+    data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
+    create_buy_document_no_source_vectorize = np.vectorize(create_buy_document_no_source)
+    create_sell_document_no_source_vectorize = np.vectorize(create_sell_document_no_source)
+    client_to_delete_vectorize = np.vectorize(client_to_delete)
+    print("creating documents ......")
+    # Add new column Dc_v4_S which is the string representation of report dealer buy on the specific day
+    data['trade_vol_BoW_S'] = create_sell_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    # Add new column Dc_v4_B which is the string representation of report dealer sell on the specific day
+    data['trade_vol_BoW_B'] = create_buy_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    print("documents created!!")
+    
+    data = data[['trade_vol_BoW_S','trade_vol_BoW_B','BOND_SYM_ID','price']].copy()
+    data_gb_sell = data[data['trade_vol_BoW_S']!='nan'].groupby(by=['trade_vol_BoW_S','BOND_SYM_ID'])
+    data_gb_buy = data[data['trade_vol_BoW_B']!='nan'].groupby(by=['trade_vol_BoW_B','BOND_SYM_ID'])
+    
+    print("computing bag_of_words ......")
+    bag_of_words = data_gb_sell['price'].sum().astype(np.int32).unstack(level=-1).to_sparse()
+    bag_of_words = bag_of_words.append(data_gb_buy['price'].sum().astype(np.int32).unstack(level=-1).to_sparse())
+    bag_of_words = bag_of_words.apply(lambda x: x / x.sum()) * 1000 # Normalize
+    bag_of_words = bag_of_words.sort_index(axis=1)
+    print("computing bag_of_words done!")
+    return bag_of_words
+
 def compute_Dc_v4(data):
     """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell"""
     create_buy_document_vectorize = np.vectorize(create_buy_document)
@@ -485,6 +517,10 @@ def main():
     # Compute a version of bag_of_words given the save_name
     if save_name=="trade_vol_BoW":
         bag_of_words = trade_vol_BoW(data,cap)
+        del data
+        save_name = save_name + "_" + cap
+    elif save_name=="trade_vol_BoW_norm":
+        bag_of_words = trade_vol_BoW_norm(data,cap)
         del data
         save_name = save_name + "_" + cap
     elif save_name=="Dc_v4":
