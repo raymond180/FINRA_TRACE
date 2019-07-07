@@ -520,7 +520,7 @@ def main():
         del data
         save_name = save_name + "_" + cap
     elif save_name=="trade_vol_BoW_norm":
-        bag_of_words = trade_vol_BoW_norm(data,cap)
+        bag_of_words = trade_vol_BoW_normw(data,cap)
         del data
         save_name = save_name + "_" + cap
     elif save_name=="Dc_v4":
