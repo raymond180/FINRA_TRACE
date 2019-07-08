@@ -88,6 +88,7 @@ def compute_Dc_v1(data):
     """Compute Dc_v1 which is count of bonds on given dealer and day"""
     create_document_vectorize = np.vectorize(create_document_2)
     print("creating documents ......")
+    data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
     # Add new column Dc_v1_S which is the string representation of report dealer buy on the specific day
     data['Dc_v1_S'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['document_date'].values)
     # Add new column Dc_v1_B which is the string representation of report dealer sell on the specific day
@@ -113,6 +114,7 @@ def compute_Dc_v2(data):
     """Compute Dc_v2 which is count of bonds on given dealer and day seperated buy and sell"""
     create_document_vectorize = np.vectorize(create_document_3)
     print("creating documents ......")
+    data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
     # Add new column Dc_v2_S which is the string representation of report dealer buy on the specific day
     data['Dc_v2_S'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['document_date'].values , 'S')
     # Add new column Dc_v2_B which is the string representation of report dealer sell on the specific day
@@ -133,7 +135,7 @@ def compute_Dc_v3(data):
     """Compute Dc_v3 which is count of bonds on given dealer and day seperated buy and sell"""
     create_document_vectorize = np.vectorize(create_document_3)
     print("creating documents ......")
-    
+    data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
     # Ignore Report_Dealer_Index that is '0' and Contra_Party_Index that is '99999'
     data = data.loc[(data['Report_Dealer_Index'] != '0') & (data['Contra_Party_Index'] != '99999')].copy()
     # Add new column Dc_v3 which is the string representation of report dealer buy on the specific day
@@ -153,7 +155,7 @@ def compute_Dc_v3(data):
     return Dc_v3
 
 def trade_vol_BoW(data,cap="large"):
-    """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell"""
+    """Compute trade_vol_BoW which is sum of bonds total trading price on given dealer and day with seperated buy and sell"""
     data['price'] = (data['ENTRD_VOL_QT'] * data['RPTD_PR'])/100
     cap_threshold = 10000
     if cap=="large":
@@ -166,9 +168,9 @@ def trade_vol_BoW(data,cap="large"):
     create_sell_document_no_source_vectorize = np.vectorize(create_sell_document_no_source)
     client_to_delete_vectorize = np.vectorize(client_to_delete)
     print("creating documents ......")
-    # Add new column Dc_v4_S which is the string representation of report dealer buy on the specific day
+    # Add new column trade_vol_BoW_S which is the string representation of report dealer buy on the specific day
     data['trade_vol_BoW_S'] = create_sell_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
-    # Add new column Dc_v4_B which is the string representation of report dealer sell on the specific day
+    # Add new column trade_vol_BoW_B which is the string representation of report dealer sell on the specific day
     data['trade_vol_BoW_B'] = create_buy_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
     print("documents created!!")
     
@@ -184,7 +186,7 @@ def trade_vol_BoW(data,cap="large"):
     return bag_of_words
 
 def trade_vol_BoW_norm(data,cap="large"):
-    """Compute Dc_v4 which is count of bonds on given dealer and day seperated buy and sell"""
+    """Compute trade_vol_BoW_norm which is sum of bonds total trading price normalized to percentage of total trading price of that bond on given dealer and day with seperated buy and sell"""
     data['price'] = (data['ENTRD_VOL_QT'] * data['RPTD_PR'])/100
     cap_threshold = 10000
     if cap=="large":
@@ -197,9 +199,41 @@ def trade_vol_BoW_norm(data,cap="large"):
     create_sell_document_no_source_vectorize = np.vectorize(create_sell_document_no_source)
     client_to_delete_vectorize = np.vectorize(client_to_delete)
     print("creating documents ......")
-    # Add new column Dc_v4_S which is the string representation of report dealer buy on the specific day
+    # Add new column trade_vol_BoW_S which is the string representation of report dealer buy on the specific day
     data['trade_vol_BoW_S'] = create_sell_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
-    # Add new column Dc_v4_B which is the string representation of report dealer sell on the specific day
+    # Add new column trade_vol_BoW_B which is the string representation of report dealer sell on the specific day
+    data['trade_vol_BoW_B'] = create_buy_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    print("documents created!!")
+    
+    data = data[['trade_vol_BoW_S','trade_vol_BoW_B','BOND_SYM_ID','price']].copy()
+    data_gb_sell = data[data['trade_vol_BoW_S']!='nan'].groupby(by=['trade_vol_BoW_S','BOND_SYM_ID'])
+    data_gb_buy = data[data['trade_vol_BoW_B']!='nan'].groupby(by=['trade_vol_BoW_B','BOND_SYM_ID'])
+    
+    print("computing bag_of_words ......")
+    bag_of_words = data_gb_sell['price'].sum().astype(np.int32).unstack(level=-1).to_sparse()
+    bag_of_words = bag_of_words.append(data_gb_buy['price'].sum().astype(np.int32).unstack(level=-1).to_sparse())
+    bag_of_words = bag_of_words.apply(lambda x: x / x.sum()) * 1000 # Normalize
+    bag_of_words = bag_of_words.sort_index(axis=1)
+    print("computing bag_of_words done!")
+    return bag_of_words
+    
+def trade_vol_BoW_outstanding(data,cap="large"):
+    """Compute trade_vol_BoW_norm which is sum of bonds total trading price normalized to percentage of total trading price of that bond on given dealer and day with seperated buy and sell"""
+    data['price'] = (data['ENTRD_VOL_QT'] * data['RPTD_PR'])/100
+    cap_threshold = 10000
+    if cap=="large":
+        data = data[data['price'] >= cap_threshold]
+        data['price'] = data['price'] / cap_threshold
+    else:
+        data = data[data['price'] < cap_threshold]
+    data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
+    create_buy_document_no_source_vectorize = np.vectorize(create_buy_document_no_source)
+    create_sell_document_no_source_vectorize = np.vectorize(create_sell_document_no_source)
+    client_to_delete_vectorize = np.vectorize(client_to_delete)
+    print("creating documents ......")
+    # Add new column trade_vol_BoW_S which is the string representation of report dealer buy on the specific day
+    data['trade_vol_BoW_S'] = create_sell_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
+    # Add new column trade_vol_BoW_B which is the string representation of report dealer sell on the specific day
     data['trade_vol_BoW_B'] = create_buy_document_no_source_vectorize(data['Report_Dealer_Index'].values,data['Contra_Party_Index'].values,data['document_date'].values)
     print("documents created!!")
     
@@ -249,6 +283,7 @@ def compute_Tc_v1(data):
     create_document_vectorize = np.vectorize(create_document_3)
     document_date2year_vectorize = np.vectorize(document_date2year)
     print("creating documents ......")
+    data['document_date'] = data['TRD_EXCTN_DTTM'].dt.date.apply(lambda x: str(x))
     # Add new column Dc_v3 which is the string representation of report dealer buy on the specific day
     data['document_date'] = document_date2year_vectorize(data['document_date'].values)
     data['Tc_v1_S_B_D'] = create_document_vectorize(data['Report_Dealer_Index'].values , data['Contra_Party_Index'].values , data['document_date'].values)
